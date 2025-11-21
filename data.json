@@ -1,0 +1,55 @@
+{
+  "users": [],
+  "products": [
+    {
+      "id": "663ce006-40ec-44a0-87f1-173d4e212f2e",
+      "name": "Kanchipuram Pattu Saree - Maroon",
+      "price": 8999,
+      "category": "Pattu",
+      "color": "Maroon",
+      "desc": "Traditional Kanchipuram pattu saree with zari border.",
+      "images": [
+        "https://via.placeholder.com/800x800?text=Kanchipuram+Maroon"
+      ],
+      "stock": 5
+    },
+    {
+      "id": "e447a720-8471-4c80-81b7-dd2ad5b5fd53",
+      "name": "Soft Silk Saree - Pastel Pink",
+      "price": 3499,
+      "category": "Silk",
+      "color": "Pink",
+      "desc": "Soft silk saree for parties and weddings.",
+      "images": [
+        "https://via.placeholder.com/800x800?text=Soft+Silk+Pink"
+      ],
+      "stock": 8
+    },
+    {
+      "id": "63fdf9fc-25dc-4b5b-a711-eee8cc1dfb73",
+      "name": "Banarasi Saree - Gold Zari",
+      "price": 12999,
+      "category": "Banarasi",
+      "color": "Gold",
+      "desc": "Rich Banarasi with intricate floral patterns.",
+      "images": [
+        "https://via.placeholder.com/800x800?text=Banarasi+Gold"
+      ],
+      "stock": 3
+    },
+    {
+      "id": "0e2162aa-118a-46ba-9baa-aa204c6ef155",
+      "name": "Cotton Daily Wear Saree - Blue",
+      "price": 1199,
+      "category": "Cotton",
+      "color": "Blue",
+      "desc": "Comfortable cotton saree for daily wear.",
+      "images": [
+        "https://via.placeholder.com/800x800?text=Cotton+Blue"
+      ],
+      "stock": 20
+    }
+  ],
+  "carts": [],
+  "orders": []
+}

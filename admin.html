@@ -1,0 +1,89 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Admin - Saree Boutique</title>
+<style>
+  body{font-family:Arial;padding:18px}
+  input,textarea,select{padding:8px;margin:6px 0;width:100%;box-sizing:border-box}
+  .btn{padding:8px 10px;background:#8b0000;color:#fff;border:none;border-radius:6px;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:8px;border:1px solid #ddd}
+</style>
+</head><body>
+<h1>Admin Panel (Demo)</h1>
+<p>Send header <code>x-admin-secret</code> with value shown on server console to perform admin actions.</p>
+<div>
+  <h3>Add Product (Manual image URLs)</h3>
+  <input id="p-name" placeholder="Name"/>
+  <input id="p-price" placeholder="Price"/>
+  <input id="p-category" placeholder="Category (e.g., Silk)"/>
+  <input id="p-color" placeholder="Color"/>
+  <input id="p-stock" placeholder="Stock"/>
+  <textarea id="p-desc" placeholder="Description"></textarea>
+  <input id="p-images" placeholder="Image URLs (comma separated)"/>
+  <button class="btn" id="btn-add">Add Product</button>
+</div>
+<hr/>
+<h3>Products</h3>
+<div id="products"></div>
+<hr/>
+<h3>Orders</h3>
+<div id="orders"></div>
+
+<script>
+const API = '/api';
+const ADMIN_SECRET = 'change_this_admin_secret_please_change';
+
+function fetchProducts(){
+  fetch(API + '/products').then(r=>r.json()).then(list=>{
+    let html = '<table><tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
+    list.forEach(p=>{
+      html += '<tr>';
+      html += '<td><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/80') +'" style="width:80px;border-radius:4px"></td>';
+      html += '<td>'+p.name+'</td>';
+      html += '<td>'+p.price+'</td>';
+      html += '<td>'+p.category+'</td>';
+      html += '<td>'+p.stock+'</td>';
+      html += '<td><button onclick="deleteP(\''+p.id+'\')">Delete</button></td>';
+      html += '</tr>';
+    });
+    html += '</table>';
+    document.getElementById('products').innerHTML = html;
+  });
+}
+function fetchOrders(){
+  fetch(API + '/admin/orders', { headers: { 'x-admin-secret': ADMIN_SECRET } }).then(r=>r.json()).then(list=>{
+    let html = '<table><tr><th>Order ID</th><th>User</th><th>Total</th><th>Payment</th><th>Shipping</th></tr>';
+    list.forEach(o => {
+      html += '<tr>';
+      html += '<td>'+o.id+'</td>';
+      html += '<td>'+o.userId+'</td>';
+      html += '<td>'+o.totalAmount+'</td>';
+      html += '<td>'+o.paymentMode+'</td>';
+      html += '<td>'+ (o.shipping ? (o.shipping.name + ', ' + o.shipping.address + ', ' + o.shipping.city + ' - ' + o.shipping.pincode) : '') +'</td>';
+      html += '</tr>';
+    });
+    html += '</table>';
+    document.getElementById('orders').innerHTML = html;
+  });
+}
+
+document.getElementById('btn-add').addEventListener('click', ()=>{
+  const name = document.getElementById('p-name').value;
+  const price = document.getElementById('p-price').value;
+  const category = document.getElementById('p-category').value;
+  const color = document.getElementById('p-color').value;
+  const stock = document.getElementById('p-stock').value;
+  const desc = document.getElementById('p-desc').value;
+  const images = document.getElementById('p-images').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if (!name || !price) return alert('name & price required');
+  fetch(API + '/products', { method:'POST', headers: { 'Content-Type':'application/json', 'x-admin-secret': ADMIN_SECRET }, body: JSON.stringify({ name, price, category, color, stock, desc, images }) })
+    .then(r=>r.json()).then(res=>{ alert(res.message); fetchProducts(); });
+});
+
+function deleteP(id){
+  if (!confirm('Delete product?')) return;
+  fetch(API + '/products/' + id, { method:'DELETE', headers: { 'x-admin-secret': ADMIN_SECRET } }).then(r=>r.json()).then(res=>{ alert(res.message); fetchProducts(); });
+}
+
+fetchProducts(); fetchOrders();
+</script>
+</body></html>
