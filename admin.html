@@ -114,7 +114,7 @@
 
   <script>
     const API = "/api/products";
-    const adminSecret = prompt("Enter Admin Secret Key:");
+    const adminSecret = "ramanayya2602"; // Hardcoded admin secret
 
     async function loadProducts() {
       let res = await fetch(API);
@@ -159,7 +159,7 @@
         alert("Product added successfully!");
         loadProducts();
       } else {
-        alert("Failed to add product");
+        alert("Failed to add product. Check your secret code.");
       }
     }
 
@@ -177,7 +177,7 @@
         alert("Product deleted");
         loadProducts();
       } else {
-        alert("Failed to delete");
+        alert("Failed to delete. Check your secret code.");
       }
     }
 
