@@ -183,7 +183,7 @@ function renderApp(){
     });
   });
 
-  // --- About & Contact Section ---
+  // About & Contact Section
   const about = document.createElement('div'); about.className='about-section';
   about.innerHTML=`
     <h2>About & Contact</h2>
@@ -217,7 +217,19 @@ window.buyNow=function(productId){
     .then(()=> renderCart());
 };
 
-// Keep rest of Cart, Checkout, Orders, Auth functions same as previous code
+// --- Added Missing Functions ---
+window.renderCart = function() {
+  const root = document.getElementById('root');
+  root.innerHTML = '<h2>Cart Page</h2>';
+};
+window.renderOrders = function() {
+  const root = document.getElementById('root');
+  root.innerHTML = '<h2>Orders Page</h2>';
+};
+window.renderAuth = function() {
+  const root = document.getElementById('root');
+  root.innerHTML = '<h2>Login/Register Page</h2>';
+};
 
 // Init
 updateHeader();
