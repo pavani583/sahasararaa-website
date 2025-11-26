@@ -7,53 +7,62 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <style>
-  :root{--primary:#004d40;--gold:#FFD700;--muted:#666}
-  body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
-  header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
-  header h1{margin:0;font-size:20px}
-  a{color:inherit;text-decoration:none}
-  .container{max-width:1100px;margin:18px auto;padding:0 12px}
-  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
-  img{max-width:100%;border-radius:6px}
-  .btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
-  input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
-  .muted{color:var(--muted)}
-  .flex{display:flex;gap:8px;align-items:center}
-  
-  /* Hero Slider */
-  .hero-slider { position: relative; width: 100%; height: 400px; overflow: hidden; border-radius:10px; margin-bottom:24px; }
-  .hero-slide { width:100%; height:100%; background-size:cover; background-position:center; position:absolute; top:0; left:0; transition:opacity 1s ease; opacity:0; }
-  .hero-slide.active { opacity:1; }
-  .hero-slide .overlay { position:absolute; bottom:30px; left:30px; color:var(--gold); background: rgba(0,77,64,0.6); padding:12px 18px; border-radius:6px; font-size:1.5rem; font-weight:bold; }
+:root{--primary:#004d40;--gold:#FFD700;--muted:#666}
+body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
+header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:relative}
+header h1{margin:0;font-size:20px}
+a{color:inherit;text-decoration:none}
+.container{max-width:1100px;margin:18px auto;padding:0 12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
+img{max-width:100%;border-radius:6px}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
+.muted{color:var(--muted)}
+.flex{display:flex;gap:8px;align-items:center}
 
-  /* Categories Section */
-  .categories { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
-  .category { flex:1; min-width:200px; height:180px; background-size:cover; background-position:center; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.5rem; font-weight:bold; cursor:pointer; transition:transform 0.3s ease; text-align:center; }
-  .category:hover { transform:scale(1.05); }
+/* Hero Slider */
+.hero-slider { position: relative; width: 100%; height: 400px; overflow: hidden; border-radius:10px; margin-bottom:24px; }
+.hero-slide { width:100%; height:100%; background-size:cover; background-position:center; position:absolute; top:0; left:0; transition:opacity 1s ease; opacity:0; }
+.hero-slide.active { opacity:1; }
+.hero-slide .overlay { position:absolute; bottom:30px; left:30px; color:var(--gold); background: rgba(0,77,64,0.6); padding:12px 18px; border-radius:6px; font-size:1.5rem; font-weight:bold; }
 
-  /* Trending Products Section */
-  .trending-section { background:var(--primary); color:#fff; padding:20px; border-radius:10px; margin-bottom:24px; }
-  .trending-section h2 { color:var(--gold); margin-bottom:12px; text-align:center; }
-  .trending-section .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
-  .trending-section .card { background:#fafafa; color:#111; border-radius:8px; padding:10px; }
+/* Categories Section */
+.categories { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.category { flex:1; min-width:200px; height:180px; background-size:cover; background-position:center; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:1.5rem; font-weight:bold; cursor:pointer; transition:transform 0.3s ease; text-align:center; }
+.category:hover { transform:scale(1.05); }
 
-  /* About & Contact Section */
-  .about-section { background:#f8f8f8; color:#111; padding:20px; border-radius:10px; margin-bottom:24px; }
-  .about-section h2 { color:var(--primary); margin-bottom:12px; text-align:center; }
-  .about-section p { margin:6px 0; }
+/* Trending Products Section */
+.trending-section { background:var(--primary); color:#fff; padding:20px; border-radius:10px; margin-bottom:24px; }
+.trending-section h2 { color:var(--gold); margin-bottom:12px; text-align:center; }
+.trending-section .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
+.trending-section .card { background:#fafafa; color:#111; border-radius:8px; padding:10px; }
 
-  /* Responsive adjustments */
-  @media (max-width:768px){
-    .hero-slider { height:250px; }
-    .hero-slide .overlay { font-size:1.2rem; padding:8px 12px; bottom:20px; left:15px; }
-    .category { min-height:140px; font-size:1.2rem; }
-  }
+/* About & Contact Section */
+.about-section { background:#f8f8f8; color:#111; padding:20px; border-radius:10px; margin-bottom:24px; }
+.about-section h2 { color:var(--primary); margin-bottom:12px; text-align:center; }
+.about-section p { margin:6px 0; }
 
-  @media (max-width:480px){
-    .hero-slider { height:180px; }
-    .category { flex:1 1 100%; min-height:120px; font-size:1rem; }
-  }
+/* Hamburger Menu */
+.hamburger { display:none; flex-direction:column; cursor:pointer; gap:4px; }
+.hamburger div { width:25px; height:3px; background:#fff; }
+.nav-links { display:flex; gap:12px; align-items:center; }
+.nav-links.open { display:flex; flex-direction:column; background:var(--primary); position:absolute; top:60px; right:0; width:200px; padding:12px; border-radius:6px; }
+.nav-links.open a{ padding:8px 0; display:block; }
+
+/* Responsive adjustments */
+@media (max-width:768px){
+  .hero-slider { height:250px; }
+  .hero-slide .overlay { font-size:1.2rem; padding:8px 12px; bottom:20px; left:15px; }
+  .category { min-height:140px; font-size:1.2rem; }
+  .nav-links{ display:none; }
+  .hamburger { display:flex; }
+}
+
+@media (max-width:480px){
+  .hero-slider { height:180px; }
+  .category { flex:1 1 100%; min-height:120px; font-size:1rem; }
+}
 </style>
 </head>
 <body>
@@ -62,142 +71,128 @@
     <img src="/images/SASRS_logo.png" alt="Sahasrara Logo" style="height:50px;">
     <h1>SAHASARARAA</h1>
   </div>
-  <nav style="display:flex;gap:12px;align-items:center">
+  <div class="hamburger" id="hamburger"><div></div><div></div><div></div></div>
+  <nav class="nav-links" id="nav-links">
     <span id="header-welcome" style="font-size:14px"></span>
-    <a href="#" id="link-home" style="color:#fff">Home</a>
-    <a href="#" id="link-cart" style="color:#fff">Cart (<span id="cart-count">0</span>)</a>
-    <a href="#" id="link-orders" style="color:#fff">Orders</a>
-    <a href="#" id="link-auth" style="color:#fff">Login/Register</a>
-    <a href="/admin.html" style="color:#fff">Admin</a>
+    <a href="#" id="link-home">Home</a>
+    <a href="#" id="link-cart">Cart (<span id="cart-count">0</span>)</a>
+    <a href="#" id="link-orders">Orders</a>
+    <a href="#" id="link-auth">Login/Register</a>
+    <a href="/admin.html">Admin</a>
   </nav>
 </header>
 <div id="root" class="container"></div>
 
 <script>
-const e = React.createElement;
-const API = '/api';
+const API='/api';
+window.appState = { token: localStorage.getItem('token'), user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null };
 
-function setAuth(token, user){
+// Hamburger toggle
+document.getElementById('hamburger').addEventListener('click', ()=>{ 
+  document.getElementById('nav-links').classList.toggle('open');
+});
+
+// Auth functions
+function setAuth(token,user){
   if(token) localStorage.setItem('token',token); else localStorage.removeItem('token');
   if(user) localStorage.setItem('user',JSON.stringify(user)); else localStorage.removeItem('user');
-  window.appState.token = token;
-  window.appState.user = user;
-  updateHeader();
+  window.appState.token=token; window.appState.user=user; updateHeader();
 }
-function getToken(){ return localStorage.getItem('token'); }
-function getUser(){ return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; }
-window.appState = { token:getToken(), user:getUser() };
-
 function updateHeader(){
-  const welcome = document.getElementById('header-welcome');
-  const authLink = document.getElementById('link-auth');
+  const welcome=document.getElementById('header-welcome');
+  const authLink=document.getElementById('link-auth');
   if(window.appState.user){
-    welcome.textContent = 'Hi, ' + window.appState.user.name;
-    authLink.textContent = 'Logout';
+    welcome.textContent='Hi, '+window.appState.user.name;
+    authLink.textContent='Logout';
   } else {
-    welcome.textContent = '';
-    authLink.textContent = 'Login/Register';
+    welcome.textContent='';
+    authLink.textContent='Login/Register';
   }
   fetchCartCount();
 }
 
-document.getElementById('link-home').addEventListener('click', ev=>{ ev.preventDefault(); renderApp(); });
-document.getElementById('link-cart').addEventListener('click', ev=>{ ev.preventDefault(); renderCart(); });
-document.getElementById('link-orders').addEventListener('click', ev=>{ ev.preventDefault(); renderOrders(); });
-document.getElementById('link-auth').addEventListener('click', ev=>{ ev.preventDefault(); if(window.appState.user){ setAuth(null,null); alert('Logged out'); renderApp(); } else renderAuth(); });
+// Header links
+document.getElementById('link-home').addEventListener('click', e=>{e.preventDefault(); renderApp();});
+document.getElementById('link-cart').addEventListener('click', e=>{e.preventDefault(); renderCart();});
+document.getElementById('link-orders').addEventListener('click', e=>{e.preventDefault(); renderOrders();});
+document.getElementById('link-auth').addEventListener('click', e=>{
+  e.preventDefault();
+  if(window.appState.user){ setAuth(null,null); alert('Logged out'); renderApp(); } 
+  else renderAuth();
+});
 
 function fetchCartCount(){
-  const el = document.getElementById('cart-count');
+  const el=document.getElementById('cart-count');
   if(!window.appState.token){ el.textContent='0'; return; }
-  fetch(API+'/cart',{ headers:{ 'Authorization':'Bearer '+window.appState.token }})
+  fetch(API+'/cart',{headers:{'Authorization':'Bearer '+window.appState.token}})
     .then(r=>r.json()).then(data=>{
-      const n = data.items ? data.items.reduce((s,i)=>s+i.qty,0) : 0;
+      const n=data.items ? data.items.reduce((s,i)=>s+i.qty,0) : 0;
       el.textContent=n;
     }).catch(()=>el.textContent='0');
 }
 
+// --- Home Page ---
 function renderApp(){
-  const container = document.getElementById('root');
-  container.innerHTML='';
-
+  const container=document.getElementById('root'); container.innerHTML='';
   // Hero Slider
-  const hero = document.createElement('div'); hero.className='hero-slider';
-  const slides = [
-    {img:'/images/hero1.jpg', text:'Festive Collection'},
-    {img:'/images/hero2.jpg', text:'Elegant Men’s Wear'},
-    {img:'/images/hero3.jpg', text:'Kids Special'}
-  ];
+  const hero=document.createElement('div'); hero.className='hero-slider';
+  const slides=[{img:'/images/hero1.jpg', text:'Festive Collection'},{img:'/images/hero2.jpg', text:'Elegant Men’s Wear'},{img:'/images/hero3.jpg', text:'Kids Special'}];
   slides.forEach((s,i)=>{
-    const slide = document.createElement('div');
+    const slide=document.createElement('div');
     slide.className='hero-slide'+(i===0?' active':'');
     slide.style.backgroundImage='url('+s.img+')';
     slide.innerHTML=`<div class="overlay">${s.text}</div>`;
     hero.appendChild(slide);
   });
   container.appendChild(hero);
-
   let currentSlide=0;
-  setInterval(()=>{
-    const allSlides=document.querySelectorAll('.hero-slide');
-    allSlides.forEach(sl=>sl.classList.remove('active'));
-    currentSlide=(currentSlide+1)%slides.length;
-    allSlides[currentSlide].classList.add('active');
-  },4000);
+  setInterval(()=>{ const all=document.querySelectorAll('.hero-slide'); all.forEach(sl=>sl.classList.remove('active')); currentSlide=(currentSlide+1)%slides.length; all[currentSlide].classList.add('active'); },4000);
 
   // Categories
-  const catSec = document.createElement('div'); catSec.className='categories';
-  const categories=[
-    {name:'Men', img:'/images/men.jpg'},
-    {name:'Women', img:'/images/women.jpg'},
-    {name:'Kids', img:'/images/kids.jpg'}
-  ];
+  const catSec=document.createElement('div'); catSec.className='categories';
+  const categories=[{name:'Men', img:'/images/men.jpg'},{name:'Women', img:'/images/women.jpg'},{name:'Kids', img:'/images/kids.jpg'}];
   categories.forEach(c=>{
     const div=document.createElement('div'); div.className='category';
-    div.style.backgroundImage='url('+c.img+')';
-    div.textContent=c.name;
+    div.style.backgroundImage='url('+c.img+')'; div.textContent=c.name;
     div.addEventListener('click', ()=>{ loadProducts(c.name); });
     catSec.appendChild(div);
   });
   container.appendChild(catSec);
 
-  // Trending Section
+  // Trending
   const trending=document.createElement('div'); trending.className='trending-section';
   trending.innerHTML='<h2>Trending Now</h2><div id="trending-list" class="grid"></div>';
   container.appendChild(trending);
-
   fetch(API+'/products').then(r=>r.json()).then(list=>{
-    const wrap=document.getElementById('trending-list');
-    wrap.innerHTML='';
+    const wrap=document.getElementById('trending-list'); wrap.innerHTML='';
     list.slice(0,6).forEach(p=>{
       const card=document.createElement('div'); card.className='card';
       card.innerHTML=`
-        <img src="${(p.images&&p.images[0])?p.images[0]:'https://via.placeholder.com/500x350?text='+encodeURIComponent(p.name)}" style="border-radius:6px;"/>
+        <img src="${p.images && p.images[0]?p.images[0]:'https://via.placeholder.com/500x350?text='+encodeURIComponent(p.name)}"/>
         <h3>${p.name}</h3>
         <div class="muted">₹${p.price}</div>
         <div class="flex" style="margin-top:8px; justify-content:center;">
           <button class="btn" onclick="viewProduct('${p.id}')">View</button>
           <button class="btn" onclick="addToCart('${p.id}',1)" style="background:#333">Add to Cart</button>
-        </div>
-      `;
+        </div>`;
       wrap.appendChild(card);
     });
   });
 
-  // About & Contact Section
-  const about = document.createElement('div'); about.className='about-section';
+  // About
+  const about=document.createElement('div'); about.className='about-section';
   about.innerHTML=`
     <h2>About & Contact</h2>
     <p><b>Founder:</b> Mahesh Arikonda</p>
     <p><b>Owner:</b> Devika Arikonda</p>
     <p><b>Contact:</b> 8050990669</p>
     <p><b>Email:</b> devikaarikonda@gmail.com</p>
-    <p><b>Addresses:</b></p>
     <p>Bangalore, Karnataka</p>
-    <p>Nellore, Andhra Pradesh, 524002</p>
-  `;
+    <p>Nellore, Andhra Pradesh, 524002</p>`;
   container.appendChild(about);
 }
 
+// --- Product Detail ---
 window.viewProduct=function(id){
   fetch(API+'/products/'+id).then(r=>r.json()).then(p=>{
     const root=document.getElementById('root');
@@ -205,43 +200,27 @@ window.viewProduct=function(id){
   });
 };
 
+// --- Cart & Orders ---
 window.addToCart=function(productId,qty){
   if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-  fetch(API+'/cart',{ method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token }, body:JSON.stringify({ productId, qty }) })
-    .then(r=>r.json()).then(res=>{ alert(res.message||'Added'); fetchCartCount(); }).catch(()=>alert('Error'));
+  fetch(API+'/cart',{method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token}, body:JSON.stringify({productId,qty})})
+    .then(r=>r.json()).then(()=>{ fetchCartCount(); alert('Added to cart'); renderCart(); }).catch(()=>alert('Error adding cart'));
 };
+window.buyNow=function(productId){ addToCart(productId,1); renderCart(); }
 
-window.buyNow=function(productId){
+window.renderCart=function(){
+  const root=document.getElementById('root');
   if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-  fetch(API+'/cart',{ method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token }, body:JSON.stringify({ productId, qty:1 }) })
-    .then(()=> renderCart());
-};
-
-// --- Added Missing Functions ---
-// --- Full Cart Page ---
-window.renderCart = function() {
-  const root = document.getElementById('root');
-  if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-  root.innerHTML = '<h2>Cart</h2><div id="cart-items">Loading...</div>';
-
-  fetch(API+'/cart', { headers:{ 'Authorization':'Bearer '+window.appState.token }})
-    .then(r=>r.json())
-    .then(data=>{
-      const wrap = document.getElementById('cart-items');
-      if(!data.items || data.items.length===0){
-        wrap.innerHTML = '<p>Your cart is empty.</p>';
-        return;
-      }
-
-      wrap.innerHTML = '';
-      let total = 0;
-
+  root.innerHTML='<h2>Cart</h2><div id="cart-items">Loading...</div>';
+  fetch(API+'/cart',{headers:{'Authorization':'Bearer '+window.appState.token}})
+    .then(r=>r.json()).then(data=>{
+      const wrap=document.getElementById('cart-items'); wrap.innerHTML='';
+      if(!data.items || data.items.length===0){ wrap.innerHTML='<p>Your cart is empty.</p>'; return; }
+      let total=0;
       data.items.forEach(item=>{
-        total += item.price * item.qty;
-        const div = document.createElement('div');
-        div.className='card flex';
-        div.style.justifyContent='space-between';
-        div.innerHTML = `
+        total+=item.price*item.qty;
+        const div=document.createElement('div'); div.className='card flex'; div.style.justifyContent='space-between';
+        div.innerHTML=`
           <div style="flex:1">
             <img src="${item.image || 'https://via.placeholder.com/150'}" style="width:100px;height:100px;border-radius:6px;object-fit:cover"/>
             <div><b>${item.name}</b></div>
@@ -251,72 +230,142 @@ window.renderCart = function() {
             <button class="btn" style="background:#888" onclick="updateCartItem('${item.productId}', ${item.qty+1})">+</button>
             <button class="btn" style="background:#888" onclick="updateCartItem('${item.productId}', ${item.qty-1})">-</button>
             <button class="btn" style="background:#c00" onclick="removeCartItem('${item.productId}')">Remove</button>
-          </div>
-        `;
+          </div>`;
         wrap.appendChild(div);
       });
-
-      const totalDiv = document.createElement('div');
-      totalDiv.style.textAlign='right';
-      totalDiv.style.marginTop='12px';
-      totalDiv.innerHTML = `<h3>Total: ₹${total}</h3><button class="btn" onclick="checkout()">Checkout</button>`;
+      const totalDiv=document.createElement('div'); totalDiv.style.textAlign='right'; totalDiv.style.marginTop='12px';
+      totalDiv.innerHTML=`<h3>Total: ₹${total}</h3><button class="btn" onclick="checkout()">Checkout</button>`;
       wrap.appendChild(totalDiv);
-    })
-    .catch(()=>document.getElementById('cart-items').innerHTML='<p>Error loading cart.</p>');
+    }).catch(()=>document.getElementById('cart-items').innerHTML='<p>Error loading cart.</p>');
 };
+window.updateCartItem=function(productId,qty){ if(qty<=0){ removeCartItem(productId); return; } fetch(API+'/cart',{method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token}, body:JSON.stringify({productId,qty})}).then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error updating cart')); };
+window.removeCartItem=function(productId){ fetch(API+'/cart/'+productId,{method:'DELETE',headers:{'Authorization':'Bearer '+window.appState.token}}).then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error removing item')); };
+window.checkout=function(){ alert('Checkout not implemented yet.'); };
 
-window.updateCartItem = function(productId, qty){
-  if(qty <= 0) { removeCartItem(productId); return; }
-  fetch(API+'/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token }, body:JSON.stringify({ productId, qty })})
-    .then(r=>r.json()).then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error updating cart'));
-};
-
-window.removeCartItem = function(productId){
-  fetch(API+'/cart/'+productId, { method:'DELETE', headers:{ 'Authorization':'Bearer '+window.appState.token }})
-    .then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error removing item'));
-};
-
-window.checkout = function(){
-  alert('Checkout functionality not implemented yet.');
-};
-
-// --- Full Orders Page ---
-window.renderOrders = function(){
-  const root = document.getElementById('root');
-  if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-  root.innerHTML = '<h2>Orders</h2><div id="orders-list">Loading...</div>';
-
-  fetch(API+'/orders', { headers:{ 'Authorization':'Bearer '+window.appState.token }})
-    .then(r=>r.json())
-    .then(data=>{
-      const wrap = document.getElementById('orders-list');
-      if(!data.orders || data.orders.length===0){
-        wrap.innerHTML = '<p>You have no orders yet.</p>';
-        return;
-      }
-      wrap.innerHTML = '';
+window.renderOrders=function(){
+  const root=document.getElementById('root'); if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  root.innerHTML='<h2>Orders</h2><div id="orders-list">Loading...</div>';
+  fetch(API+'/orders',{headers:{'Authorization':'Bearer '+window.appState.token}})
+    .then(r=>r.json()).then(data=>{
+      const wrap=document.getElementById('orders-list'); wrap.innerHTML='';
+      if(!data.orders || data.orders.length===0){ wrap.innerHTML='<p>You have no orders yet.</p>'; return; }
       data.orders.forEach(order=>{
-        const div = document.createElement('div');
-        div.className='card';
-        div.style.marginBottom='12px';
-        div.innerHTML = `
-          <div><b>Order ID:</b> ${order.id}</div>
-          <div><b>Status:</b> ${order.status}</div>
-          <div><b>Total:</b> ₹${order.total}</div>
-          <div class="muted">Date: ${new Date(order.date).toLocaleString()}</div>
-          <div style="margin-top:8px">
-            ${order.items.map(i=>`<div>${i.name} x ${i.qty} = ₹${i.price*i.qty}</div>`).join('')}
-          </div>
-        `;
+        const div=document.createElement('div'); div.className='card'; div.style.marginBottom='12px';
+        div.innerHTML=`<div><b>Order ID:</b> ${order.id}</div><div><b>Status:</b> ${order.status}</div><div><b>Total:</b> ₹${order.total}</div><div class="muted">Date: ${new Date(order.date).toLocaleString()}</div><div style="margin-top:8px">${order.items.map(i=>`<div>${i.name} x ${i.qty} = ₹${i.price*i.qty}</div>`).join('')}</div>`;
         wrap.appendChild(div);
       });
-    })
-    .catch(()=>document.getElementById('orders-list').innerHTML='<p>Error loading orders.</p>');
+    }).catch(()=>document.getElementById('orders-list').innerHTML='<p>Error loading orders.</p>');
 };
 
-// Init
+// --- Login/Register ---
+window.renderAuth=function(){
+  const root=document.getElementById('root'); root.innerHTML=`
+    <h2>Login / Register</h2>
+    <div style="max-width:400px;margin:auto;">
+      <input type="text" id="auth-name" placeholder="Full Name"/>
+      <input type="email" id="auth-email" placeholder="Email"/>
+      <input type="tel" id="auth-phone" placeholder="Phone"/>
+      <button class="btn" onclick="submitAuth()">Send OTP</button>
+      <input type="text" id="auth-otp" placeholder="Enter OTP"/>
+      <button class="btn" onclick="verifyOtp()">Verify OTP</button>
+    </div>
+  `;
+};
+
+window.submitAuth = function() {
+  const name = document.getElementById('auth-name').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
+  const phone = document.getElementById('auth-phone').value.trim();
+
+  if(!email && !phone){ alert('Please provide Email or Phone'); return; }
+
+  fetch(API+'/auth/send-otp', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ name, email, phone })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.success){ 
+      alert('OTP sent to your email/phone.'); 
+      document.getElementById('auth-otp').focus();
+    } else alert(res.message || 'Error sending OTP');
+  })
+  .catch(()=>alert('Network error sending OTP'));
+};
+
+window.verifyOtp = function() {
+  const email = document.getElementById('auth-email').value.trim();
+  const phone = document.getElementById('auth-phone').value.trim();
+  const otp = document.getElementById('auth-otp').value.trim();
+
+  if(!otp){ alert('Please enter OTP'); return; }
+
+  fetch(API+'/auth/verify-otp', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ email, phone, otp })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.success && res.token && res.user){
+      setAuth(res.token, res.user);
+      alert('Login successful');
+      renderApp();
+    } else alert(res.message || 'Invalid OTP');
+  })
+  .catch(()=>alert('Network error verifying OTP'));
+};
+  // --- Send OTP / Login/Register ---
+window.submitAuth = function() {
+  const name = document.getElementById('auth-name').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
+  const phone = document.getElementById('auth-phone').value.trim();
+
+  if(!email || !phone){ alert('Please enter email and phone'); return; }
+
+  fetch(API+'/auth/send-otp', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ name, email, phone })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.success){
+      alert('OTP sent to your email/phone');
+    } else {
+      alert(res.message || 'Error sending OTP');
+    }
+  })
+  .catch(()=>alert('Network error sending OTP'));
+};
+
+// --- Load products for category ---
+window.loadProducts = function(category){
+  const root = document.getElementById('root');
+  root.innerHTML = `<h2>${category} Collection</h2><div id="category-products" class="grid"></div>`;
+  fetch(API+'/products?category='+encodeURIComponent(category))
+    .then(r=>r.json())
+    .then(list=>{
+      const wrap=document.getElementById('category-products');
+      wrap.innerHTML='';
+      list.forEach(p=>{
+        const card=document.createElement('div'); card.className='card';
+        card.innerHTML=`
+          <img src="${(p.images&&p.images[0])?p.images[0]:'https://via.placeholder.com/500x350?text='+encodeURIComponent(p.name)}" style="border-radius:6px;"/>
+          <h3>${p.name}</h3>
+          <div class="muted">₹${p.price}</div>
+          <div class="flex" style="margin-top:8px; justify-content:center;">
+            <button class="btn" onclick="viewProduct('${p.id}')">View</button>
+            <button class="btn" onclick="addToCart('${p.id}',1)" style="background:#333">Add to Cart</button>
+          </div>
+        `;
+        wrap.appendChild(card);
+      });
+    })
+    .catch(()=>{ document.getElementById('category-products').innerHTML='<p>Error loading products.</p>'; });
+};
+
+// --- Initialize ---
 updateHeader();
 renderApp();
-</script>
-</body>
-</html>
