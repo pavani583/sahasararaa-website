@@ -9,24 +9,26 @@
 <style>
 :root{--primary:#8b0000;--muted:#666}
 body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
-header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:relative}
+header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1000;transition:0.3s}
 header h1{margin:0;font-size:20px}
 a{color:inherit;text-decoration:none}
 .container{max-width:1100px;margin:18px auto;padding:0 12px}
 .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
 img{max-width:100%;border-radius:6px}
-.btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer;transition:0.2s}
+.btn:hover{opacity:0.95}
 input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
 .muted{color:var(--muted)}
 .flex{display:flex;gap:8px;align-items:center}
 
 /* Hamburger Menu */
-.menu-btn{display:none;flex-direction:column;gap:4px;cursor:pointer}
-.menu-btn div{width:25px;height:3px;background:#fff}
-.nav-links{display:flex;gap:12px;align-items:center}
+.menu-btn{display:none;flex-direction:column;gap:4px;cursor:pointer;z-index:1100}
+.menu-btn div{width:25px;height:3px;background:#fff;transition:0.3s}
+.nav-links{display:flex;gap:12px;align-items:center;transition:all 0.3s ease}
 .nav-links a{color:#fff}
-.nav-links.show{display:flex;flex-direction:column;position:absolute;top:60px;left:0;width:100%;background:var(--primary);padding:10px;gap:10px}
+.nav-links.show{display:flex;flex-direction:column;position:absolute;top:60px;left:0;width:100%;background:var(--primary);padding:12px;gap:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2);transform:translateY(-20px);opacity:0;animation:slideDown 0.25s forwards}
+@keyframes slideDown{to{transform:translateY(0);opacity:1}}
 @media (max-width:768px){
   .nav-links{display:none}
   .menu-btn{display:flex}
@@ -34,6 +36,9 @@ input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:
 #hero{background:#f8f8f8;padding:40px 12px;text-align:center;margin-bottom:12px;border-radius:8px}
 #hero h2{margin:0;font-size:28px;margin-bottom:12px}
 #hero button{margin-top:12px}
+.search-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.panel{padding:12px;border-radius:8px;background:#fff;border:1px solid #eee;margin-bottom:12px}
+.small-muted{color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -43,31 +48,39 @@ input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:
     <img src="/images/SASRS_logo.png" alt="Sahasrara Logo" style="height:50px;">
     <h1>SAHASARARAA</h1>
   </div>
-  <div class="menu-btn" id="menu-toggle">
-    <div></div>
-    <div></div>
-    <div></div>
+
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="menu-btn" id="menu-toggle" title="Menu">
+      <div></div><div></div><div></div>
+    </div>
+    <nav class="nav-links" id="nav-links">
+      <span id="header-welcome" style="font-size:14px"></span>
+      <a href="#" id="link-home">Home</a>
+      <a href="#" id="link-products-nav">Products</a>
+      <a href="#" id="link-cart">Cart (<span id="cart-count">0</span>)</a>
+      <a href="#" id="link-orders">Orders</a>
+      <a href="/login.html" id="link-auth">Login/Register</a>
+      <a href="/about.html">About</a>
+      <a href="/admin.html">Admin</a>
+    </nav>
   </div>
-  <nav class="nav-links" id="nav-links">
-    <span id="header-welcome" style="font-size:14px"></span>
-    <a href="#" id="link-home">Home</a>
-    <a href="#" id="link-cart">Cart (<span id="cart-count">0</span>)</a>
-    <a href="#" id="link-orders">Orders</a>
-    <a href="#" id="link-auth">Login/Register</a>
-    <a href="/admin.html">Admin</a>
-  </nav>
 </header>
 
+<!-- Hero -->
 <div id="hero">
+  <img src="/images/SASRS_logo.png" alt="SAHASARARAA Logo" style="height:140px;margin-bottom:10px"/>
   <h2>Welcome to SAHASARARAA</h2>
-  <p>Explore our exquisite saree collections!</p>
-  <button class="btn" onclick="renderApp()">Shop Now</button>
+  <p class="small-muted">Authentic sarees — traditional weaves, modern styles.</p>
+  <button class="btn" id="btn-shop">Shop Now</button>
 </div>
 
-<div id="root" class="container"></div>
+<!-- Main root where your app renders -->
+<div id="root" class="container" style="display:none;"></div>
 
 <script>
+/* --- minimal app state + menu controls --- */
 const API = '/api';
+window.appState = { token: localStorage.getItem('token'), user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null };
 
 function setAuth(token, user){
   if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
@@ -76,29 +89,47 @@ function setAuth(token, user){
   window.appState.user = user;
   updateHeader();
 }
-
-function getToken(){ return localStorage.getItem('token'); }
-function getUser(){ return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; }
-window.appState = { token: getToken(), user: getUser() };
-
 function updateHeader(){
   const welcome = document.getElementById('header-welcome');
-  const authLink = document.getElementById('link-auth');
+  const auth = document.getElementById('link-auth');
   if (window.appState.user) {
     welcome.textContent = 'Hi, ' + window.appState.user.name;
-    authLink.textContent = 'Logout';
+    auth.textContent = 'Logout';
+    auth.href = '#';
   } else {
     welcome.textContent = '';
-    authLink.textContent = 'Login/Register';
+    auth.textContent = 'Login/Register';
+    auth.href = '/login.html';
   }
   fetchCartCount();
 }
 
-document.getElementById('link-home').addEventListener('click', (ev)=>{ ev.preventDefault(); renderApp(); });
+/* menu toggle */
+const menuToggle = document.getElementById('menu-toggle');
+const navLinks = document.getElementById('nav-links');
+menuToggle.addEventListener('click', ()=>{
+  navLinks.classList.toggle('show');
+});
+
+/* hero -> shop */
+document.getElementById('btn-shop').addEventListener('click', ()=>{
+  document.getElementById('hero').style.display='none';
+  document.getElementById('root').style.display='block';
+  renderApp();
+});
+
+/* nav link handlers */
+document.getElementById('link-home').addEventListener('click', (ev)=>{ ev.preventDefault(); document.getElementById('hero').style.display='block'; document.getElementById('root').style.display='none'; });
+document.getElementById('link-products-nav').addEventListener('click', (ev)=>{ ev.preventDefault(); document.getElementById('hero').style.display='none'; document.getElementById('root').style.display='block'; renderApp(); });
 document.getElementById('link-cart').addEventListener('click', (ev)=>{ ev.preventDefault(); renderCart(); });
 document.getElementById('link-orders').addEventListener('click', (ev)=>{ ev.preventDefault(); renderOrders(); });
-document.getElementById('link-auth').addEventListener('click', (ev)=>{ ev.preventDefault(); if (window.appState.user) { setAuth(null,null); alert('Logged out'); renderApp(); } else renderAuth(); });
+document.getElementById('link-auth').addEventListener('click', (ev)=>{ 
+  ev.preventDefault();
+  if (window.appState.user) { setAuth(null,null); alert('Logged out'); renderApp(); } 
+  else window.location = '/login.html';
+});
 
+/* cart count */
 function fetchCartCount(){
   const el = document.getElementById('cart-count');
   if (!window.appState.token){ el.textContent = '0'; return; }
@@ -109,31 +140,30 @@ function fetchCartCount(){
     }).catch(()=>el.textContent='0');
 }
 
-// Hamburger menu toggle
-document.getElementById('menu-toggle').addEventListener('click', ()=>{
-  const nav = document.getElementById('nav-links');
-  nav.classList.toggle('show');
-});
-
-// --- Existing functions --- //
+/* ---------------------------------------------------------------------------
+   The following JS block is your existing app logic (renderApp, loadProducts,
+   viewProduct, addToCart, buyNow, renderCart, renderCheckout, renderOrders, renderAuth)
+   Keeps same API calls as your backend.
+   --------------------------------------------------------------------------- */
 
 function renderApp(){
   const container = document.getElementById('root');
-  container.innerHTML = '<h2>Collections</h2><div class="panel"><input id="search" placeholder="Search sarees"/><div style="display:flex;gap:8px"><select id="cat"><option value="">All</option><option>Silk</option><option>Pattu</option><option>Banarasi</option><option>Cotton</option></select><button class="btn" id="btn-search">Search</button></div></div><div id="list" style="margin-top:12px" class="grid"></div>';
+  container.innerHTML = '<div class="panel"><div class="search-row"><input id="search" placeholder="Search sarees"/><select id="cat"><option value="">All</option><option>Silk</option><option>Pattu</option><option>Banarasi</option><option>Cotton</option></select><button class="btn" id="btn-search">Search</button></div></div><h2>Collections</h2><div id="list" style="margin-top:12px" class="grid"></div>';
   document.getElementById('btn-search').addEventListener('click', loadProducts);
   loadProducts();
 }
 
 function loadProducts(){
-  const q = document.getElementById('search').value || '';
-  const cat = document.getElementById('cat').value || '';
+  const q = document.getElementById('search') ? document.getElementById('search').value : '';
+  const cat = document.getElementById('cat') ? document.getElementById('cat').value : '';
   let url = API + '/products';
   const params = [];
   if (q) params.push('q=' + encodeURIComponent(q));
   if (cat) params.push('category=' + encodeURIComponent(cat));
   if (params.length) url += '?' + params.join('&');
   fetch(url).then(r=>r.json()).then(list=>{
-    const wrap = document.getElementById('list'); wrap.innerHTML = '';
+    const wrap = document.getElementById('list'); if(!wrap) return;
+    wrap.innerHTML = '';
     list.forEach(p=>{
       const card = document.createElement('div'); card.className='card';
       card.innerHTML = `
@@ -154,24 +184,24 @@ function loadProducts(){
 window.viewProduct = function(id){
   fetch(API + '/products/' + id).then(r=>r.json()).then(p=>{
     const root = document.getElementById('root');
-    root.innerHTML = '<div style="display:flex;gap:12px"><div style="flex:1"><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/600x600')+'" style="width:100%;height:auto;border-radius:6px"/></div><div style="flex:1"><h2>'+p.name+'</h2><div class="muted">₹'+p.price+'</div><p>'+ (p.desc||'') +'</p><div class="muted">Category: '+p.category+' | Color: '+p.color+'</div><div style="margin-top:12px"><button class="btn" onclick="addToCart(\''+p.id+'\',1)">Add to Cart</button><button class="btn" onclick="buyNow(\''+p.id+'\')">Buy Now</button></div></div></div>';
+    root.innerHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:280px"><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/600x600')+'" style="width:100%;height:auto;border-radius:6px"/></div><div style="flex:1;min-width:280px"><h2>'+p.name+'</h2><div class="muted">₹'+p.price+'</div><p>'+ (p.desc||'') +'</p><div class="muted">Category: '+p.category+' | Color: '+p.color+'</div><div style="margin-top:12px"><button class="btn" onclick="addToCart(\\''+p.id+'\\',1)">Add to Cart</button><button class="btn" onclick="buyNow(\\''+p.id+'\\')">Buy Now</button></div></div></div>';
   });
 };
 
 window.addToCart = function(productId, qty){
-  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  if (!window.appState.token){ alert('Please login/register'); window.location = '/login.html'; return; }
   fetch(API + '/cart', { method:'POST', headers: { 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty }) })
     .then(r=>r.json()).then(res=>{ alert(res.message || 'Added'); fetchCartCount(); }).catch(()=>alert('Error'));
 };
 
 window.buyNow = function(productId){
-  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  if (!window.appState.token){ alert('Please login/register'); window.location = '/login.html'; return; }
   fetch(API + '/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty:1 }) })
     .then(()=> renderCart());
 };
 
 function renderCart(){
-  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  if (!window.appState.token){ alert('Please login/register'); window.location = '/login.html'; return; }
   fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
     .then(r=>r.json()).then(data=>{
       const root = document.getElementById('root');
@@ -182,7 +212,7 @@ function renderCart(){
       data.items.forEach(it => {
         const p = it.product || {};
         const sub = (p.price||0) * it.qty; total += sub;
-        html += '<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><div style="flex:1"><b>'+ (p.name||'') +'</b><div class="muted">₹'+(p.price||0)+'</div></div><div>Qty: '+it.qty+'</div><div><button class="btn" onclick="removeCart(\''+(p.id||'')+'\')">Remove</button></div></div>';
+        html += '<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><div style="flex:1"><b>'+ (p.name||'') +'</b><div class="muted">₹'+(p.price||0)+'</div></div><div>Qty: '+it.qty+'</div><div><button class="btn" onclick="removeCart(\\''+(p.id||'')+'\\')">Remove</button></div></div>';
       });
       html += '<hr><div><b>Total: ₹'+total+'</b></div><div style="margin-top:8px"><button class="btn" onclick="renderCheckout()">Checkout (Cash on Delivery)</button></div></div>';
       root.innerHTML = html;
@@ -195,7 +225,7 @@ window.removeCart = function(productId){
 };
 
 window.renderCheckout = function(){
-  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  if (!window.appState.token){ alert('Please login/register'); window.location = '/login.html'; return; }
   const root = document.getElementById('root');
   root.innerHTML = '<h2>Checkout (Cash on Delivery)</h2><div class="panel"><input id="ship-name" placeholder="Name" value="'+(window.appState.user?window.appState.user.name:'')+'"/><input id="ship-mobile" placeholder="Mobile" value="'+(window.appState.user?window.appState.user.mobile:'')+'"/><input id="ship-address" placeholder="Address"/><input id="ship-city" placeholder="City"/><input id="ship-pincode" placeholder="Pincode"/><button class="btn" id="btn-place">Place Order</button></div>';
   document.getElementById('btn-place').addEventListener('click', ()=>{
@@ -213,7 +243,7 @@ window.renderCheckout = function(){
 };
 
 function renderOrders(){
-  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  if (!window.appState.token){ alert('Please login/register'); window.location = '/login.html'; return; }
   fetch(API + '/orders', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
     .then(r=>r.json()).then(list=>{
       const root = document.getElementById('root');
@@ -230,26 +260,12 @@ function renderOrders(){
 }
 
 function renderAuth(){
-  const root = document.getElementById('root');
-  root.innerHTML = '<h2>Login / Register</h2><div class="panel"><h3>Register</h3><input id="reg-name" placeholder="Name"/><input id="reg-mobile" placeholder="Mobile"/><button class="btn" id="btn-reg">Register</button><hr/><h3>Login</h3><input id="login-mobile" placeholder="Mobile"/><button class="btn" id="btn-login">Login</button></div>';
-  document.getElementById('btn-reg').addEventListener('click', ()=>{
-    const name = document.getElementById('reg-name').value.trim();
-    const mobile = document.getElementById('reg-mobile').value.trim();
-    if (!name || !mobile) return alert('name & mobile required');
-    fetch(API + '/auth/register', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name, mobile }) })
-      .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Registered'); renderApp(); } else alert(res.message || 'Error'); });
-  });
-  document.getElementById('btn-login').addEventListener('click', ()=>{
-    const mobile = document.getElementById('login-mobile').value.trim();
-    if (!mobile) return alert('mobile required');
-    fetch(API + '/auth/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ mobile }) })
-      .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Logged in'); renderApp(); } else alert(res.message || 'Error'); });
-  });
+  window.location = '/login.html';
 }
 
-// Init
+/* init */
 updateHeader();
-renderApp();
+document.getElementById('root').style.display = 'none'; // show hero first
 </script>
 
 </body>
