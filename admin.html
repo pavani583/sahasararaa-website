@@ -1,89 +1,188 @@
-<!doctype html>
-<html><head><meta charset="utf-8"><title>Admin - Saree Boutique</title>
-<style>
-  body{font-family:Arial;padding:18px}
-  input,textarea,select{padding:8px;margin:6px 0;width:100%;box-sizing:border-box}
-  .btn{padding:8px 10px;background:#8b0000;color:#fff;border:none;border-radius:6px;cursor:pointer}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:8px;border:1px solid #ddd}
-</style>
-</head><body>
-<h1>Admin Panel (Demo)</h1>
-<p>Send header <code>x-admin-secret</code> with value shown on server console to perform admin actions.</p>
-<div>
-  <h3>Add Product (Manual image URLs)</h3>
-  <input id="p-name" placeholder="Name"/>
-  <input id="p-price" placeholder="Price"/>
-  <input id="p-category" placeholder="Category (e.g., Silk)"/>
-  <input id="p-color" placeholder="Color"/>
-  <input id="p-stock" placeholder="Stock"/>
-  <textarea id="p-desc" placeholder="Description"></textarea>
-  <input id="p-images" placeholder="Image URLs (comma separated)"/>
-  <button class="btn" id="btn-add">Add Product</button>
-</div>
-<hr/>
-<h3>Products</h3>
-<div id="products"></div>
-<hr/>
-<h3>Orders</h3>
-<div id="orders"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sahasrara Admin Panel</title>
 
-<script>
-const API = '/api';
-const ADMIN_SECRET = 'change_this_admin_secret_please_change';
+  <style>
+    body {
+      margin: 0;
+      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+    }
 
-function fetchProducts(){
-  fetch(API + '/products').then(r=>r.json()).then(list=>{
-    let html = '<table><tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
-    list.forEach(p=>{
-      html += '<tr>';
-      html += '<td><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/80') +'" style="width:80px;border-radius:4px"></td>';
-      html += '<td>'+p.name+'</td>';
-      html += '<td>'+p.price+'</td>';
-      html += '<td>'+p.category+'</td>';
-      html += '<td>'+p.stock+'</td>';
-      html += '<td><button onclick="deleteP(\''+p.id+'\')">Delete</button></td>';
-      html += '</tr>';
-    });
-    html += '</table>';
-    document.getElementById('products').innerHTML = html;
-  });
-}
-function fetchOrders(){
-  fetch(API + '/admin/orders', { headers: { 'x-admin-secret': ADMIN_SECRET } }).then(r=>r.json()).then(list=>{
-    let html = '<table><tr><th>Order ID</th><th>User</th><th>Total</th><th>Payment</th><th>Shipping</th></tr>';
-    list.forEach(o => {
-      html += '<tr>';
-      html += '<td>'+o.id+'</td>';
-      html += '<td>'+o.userId+'</td>';
-      html += '<td>'+o.totalAmount+'</td>';
-      html += '<td>'+o.paymentMode+'</td>';
-      html += '<td>'+ (o.shipping ? (o.shipping.name + ', ' + o.shipping.address + ', ' + o.shipping.city + ' - ' + o.shipping.pincode) : '') +'</td>';
-      html += '</tr>';
-    });
-    html += '</table>';
-    document.getElementById('orders').innerHTML = html;
-  });
-}
+    .navbar {
+      background: #222;
+      color: white;
+      padding: 15px 20px;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
 
-document.getElementById('btn-add').addEventListener('click', ()=>{
-  const name = document.getElementById('p-name').value;
-  const price = document.getElementById('p-price').value;
-  const category = document.getElementById('p-category').value;
-  const color = document.getElementById('p-color').value;
-  const stock = document.getElementById('p-stock').value;
-  const desc = document.getElementById('p-desc').value;
-  const images = document.getElementById('p-images').value.split(',').map(s=>s.trim()).filter(Boolean);
-  if (!name || !price) return alert('name & price required');
-  fetch(API + '/products', { method:'POST', headers: { 'Content-Type':'application/json', 'x-admin-secret': ADMIN_SECRET }, body: JSON.stringify({ name, price, category, color, stock, desc, images }) })
-    .then(r=>r.json()).then(res=>{ alert(res.message); fetchProducts(); });
-});
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-function deleteP(id){
-  if (!confirm('Delete product?')) return;
-  fetch(API + '/products/' + id, { method:'DELETE', headers: { 'x-admin-secret': ADMIN_SECRET } }).then(r=>r.json()).then(res=>{ alert(res.message); fetchProducts(); });
-}
+    h2 {
+      margin-top: 0;
+      color: #b30059;
+      border-left: 5px solid #b30059;
+      padding-left: 10px;
+    }
 
-fetchProducts(); fetchOrders();
-</script>
-</body></html>
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      font-size: 15px;
+    }
+
+    button {
+      background: #b30059;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #800040;
+    }
+
+    .product-card {
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin: 12px 0;
+      background: #fafafa;
+    }
+
+    .product-card img {
+      width: 120px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .delete-btn {
+      background: #d11a2a !important;
+    }
+
+    .delete-btn:hover {
+      background: #a30018 !important;
+    }
+  </style>
+
+</head>
+<body>
+
+  <div class="navbar">SAHASRARA — Admin Panel</div>
+
+  <div class="container">
+    <h2>Add New Product</h2>
+
+    <input type="text" id="title" placeholder="Product Title" />
+    <input type="text" id="price" placeholder="Price" />
+    <input type="text" id="image" placeholder="Image URL" />
+    <textarea id="description" placeholder="Description"></textarea>
+
+    <button onclick="addProduct()">Add Product</button>
+  </div>
+
+  <div class="container">
+    <h2>Existing Products</h2>
+    <div id="productList">Loading...</div>
+  </div>
+
+  <script>
+    const API = "/api/products";
+    const adminSecret = prompt("Enter Admin Secret Key:");
+
+    async function loadProducts() {
+      let res = await fetch(API);
+      let data = await res.json();
+
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
+
+      data.forEach(p => {
+        container.innerHTML += `
+          <div class="product-card">
+            <img src="${p.image}" alt="Product Image" />
+            <div style="flex:1;">
+              <h3>${p.title}</h3>
+              <p>${p.description || ''}</p>
+              <p><b>₹${p.price}</b></p>
+            </div>
+            <button class="delete-btn" onclick="deleteProduct('${p._id}')">Delete</button>
+          </div>
+        `;
+      });
+    }
+
+    async function addProduct() {
+      const product = {
+        title: document.getElementById("title").value,
+        price: document.getElementById("price").value,
+        image: document.getElementById("image").value,
+        description: document.getElementById("description").value
+      };
+
+      let res = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-secret": adminSecret
+        },
+        body: JSON.stringify(product)
+      });
+
+      if (res.ok) {
+        alert("Product added successfully!");
+        loadProducts();
+      } else {
+        alert("Failed to add product");
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("Delete this product?")) return;
+
+      let res = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-secret": adminSecret
+        }
+      });
+
+      if (res.ok) {
+        alert("Product deleted");
+        loadProducts();
+      } else {
+        alert("Failed to delete");
+      }
+    }
+
+    loadProducts();
+  </script>
+
+</body>
+</html>
