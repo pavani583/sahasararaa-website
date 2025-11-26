@@ -123,7 +123,7 @@
       const container = document.getElementById("productList");
       container.innerHTML = "";
 
-      data.forEach(p => {
+    data.forEach(p => {
         container.innerHTML += `
           <div class="product-card">
             <img src="${p.image}" alt="Product Image" />
@@ -159,14 +159,14 @@
         alert("Product added successfully!");
         loadProducts();
       } else {
-        alert("Failed to add product. Check your secret code.");
+        alert("Failed to add product");
       }
     }
 
     async function deleteProduct(id) {
       if (!confirm("Delete this product?")) return;
 
-      let res = await fetch(`${API}/${id}`, {
+      let res = await fetch(⁠ ${API}/${id} ⁠, {
         method: "DELETE",
         headers: {
           "x-admin-secret": adminSecret
@@ -177,7 +177,7 @@
         alert("Product deleted");
         loadProducts();
       } else {
-        alert("Failed to delete. Check your secret code.");
+        alert("Failed to delete");
       }
     }
 
