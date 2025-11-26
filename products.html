@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Products — SAHASARARAA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
+  header{background:#8b0000;color:#fff;padding:12px}
+  .container{max-width:1100px;margin:20px auto;padding:16px}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa;text-align:center}
+  .card img{height:220px;object-fit:cover;border-radius:6px}
+  .btn{background:#8b0000;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer;margin-top:8px}
+</style>
+</head>
+<body>
+<header><div style="max-width:1100px;margin:0 auto">SAHASARARAA — Products</div></header>
+
+<div class="container">
+  <h2>All Sarees</h2>
+  <div id="list" class="grid">Loading...</div>
+</div>
+
+<script>
+const API = '/api';
+function load(){
+  fetch(API + '/products').then(r=>r.json()).then(list=>{
+    const wrap = document.getElementById('list'); wrap.innerHTML = '';
+    list.forEach(p=>{
+      const el = document.createElement('div'); el.className='card';
+      el.innerHTML = `<img src="${(p.images && p.images[0])?p.images[0]:'/images/SASRS_logo.png'}" alt="${p.name}"/>
+        <h3>${p.name}</h3>
+        <div class="muted">₹${p.price}</div>
+        <p style="font-size:14px;color:#555">${p.desc || ''}</p>
+        <button class="btn" onclick="view('${p.id}')">View</button>
+        <button class="btn" style="background:#333;margin-left:6px" onclick="add('${p.id}')">Add to Cart</button>`;
+      wrap.appendChild(el);
+    });
+  }).catch(err=>{
+    document.getElementById('list').innerHTML = 'Failed to load products';
+  });
+}
+function view(id){ window.location = '/'; /* homepage has viewProduct(id) — you can adapt if needed */ window.setTimeout(()=>{ if(window.viewProduct) window.viewProduct(id); }, 400); }
+function add(id){
+  const token = localStorage.getItem('token');
+  if(!token){ alert('Please login'); window.location='/login.html'; return; }
+  fetch(API + '/cart', { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + token }, body: JSON.stringify({ productId: id, qty:1 })})
+    .then(r=>r.json()).then(res=>{ alert(res.message || 'Added'); })
+    .catch(()=>alert('Error'));
+}
+load();
+</script>
+
+</body>
+</html>
