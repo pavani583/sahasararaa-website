@@ -218,17 +218,100 @@ window.buyNow=function(productId){
 };
 
 // --- Added Missing Functions ---
+// --- Full Cart Page ---
 window.renderCart = function() {
   const root = document.getElementById('root');
-  root.innerHTML = '<h2>Cart Page</h2>';
+  if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  root.innerHTML = '<h2>Cart</h2><div id="cart-items">Loading...</div>';
+
+  fetch(API+'/cart', { headers:{ 'Authorization':'Bearer '+window.appState.token }})
+    .then(r=>r.json())
+    .then(data=>{
+      const wrap = document.getElementById('cart-items');
+      if(!data.items || data.items.length===0){
+        wrap.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+      }
+
+      wrap.innerHTML = '';
+      let total = 0;
+
+      data.items.forEach(item=>{
+        total += item.price * item.qty;
+        const div = document.createElement('div');
+        div.className='card flex';
+        div.style.justifyContent='space-between';
+        div.innerHTML = `
+          <div style="flex:1">
+            <img src="${item.image || 'https://via.placeholder.com/150'}" style="width:100px;height:100px;border-radius:6px;object-fit:cover"/>
+            <div><b>${item.name}</b></div>
+            <div class="muted">₹${item.price} x ${item.qty}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="btn" style="background:#888" onclick="updateCartItem('${item.productId}', ${item.qty+1})">+</button>
+            <button class="btn" style="background:#888" onclick="updateCartItem('${item.productId}', ${item.qty-1})">-</button>
+            <button class="btn" style="background:#c00" onclick="removeCartItem('${item.productId}')">Remove</button>
+          </div>
+        `;
+        wrap.appendChild(div);
+      });
+
+      const totalDiv = document.createElement('div');
+      totalDiv.style.textAlign='right';
+      totalDiv.style.marginTop='12px';
+      totalDiv.innerHTML = `<h3>Total: ₹${total}</h3><button class="btn" onclick="checkout()">Checkout</button>`;
+      wrap.appendChild(totalDiv);
+    })
+    .catch(()=>document.getElementById('cart-items').innerHTML='<p>Error loading cart.</p>');
 };
-window.renderOrders = function() {
-  const root = document.getElementById('root');
-  root.innerHTML = '<h2>Orders Page</h2>';
+
+window.updateCartItem = function(productId, qty){
+  if(qty <= 0) { removeCartItem(productId); return; }
+  fetch(API+'/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer '+window.appState.token }, body:JSON.stringify({ productId, qty })})
+    .then(r=>r.json()).then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error updating cart'));
 };
-window.renderAuth = function() {
+
+window.removeCartItem = function(productId){
+  fetch(API+'/cart/'+productId, { method:'DELETE', headers:{ 'Authorization':'Bearer '+window.appState.token }})
+    .then(()=>{ renderCart(); fetchCartCount(); }).catch(()=>alert('Error removing item'));
+};
+
+window.checkout = function(){
+  alert('Checkout functionality not implemented yet.');
+};
+
+// --- Full Orders Page ---
+window.renderOrders = function(){
   const root = document.getElementById('root');
-  root.innerHTML = '<h2>Login/Register Page</h2>';
+  if(!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  root.innerHTML = '<h2>Orders</h2><div id="orders-list">Loading...</div>';
+
+  fetch(API+'/orders', { headers:{ 'Authorization':'Bearer '+window.appState.token }})
+    .then(r=>r.json())
+    .then(data=>{
+      const wrap = document.getElementById('orders-list');
+      if(!data.orders || data.orders.length===0){
+        wrap.innerHTML = '<p>You have no orders yet.</p>';
+        return;
+      }
+      wrap.innerHTML = '';
+      data.orders.forEach(order=>{
+        const div = document.createElement('div');
+        div.className='card';
+        div.style.marginBottom='12px';
+        div.innerHTML = `
+          <div><b>Order ID:</b> ${order.id}</div>
+          <div><b>Status:</b> ${order.status}</div>
+          <div><b>Total:</b> ₹${order.total}</div>
+          <div class="muted">Date: ${new Date(order.date).toLocaleString()}</div>
+          <div style="margin-top:8px">
+            ${order.items.map(i=>`<div>${i.name} x ${i.qty} = ₹${i.price*i.qty}</div>`).join('')}
+          </div>
+        `;
+        wrap.appendChild(div);
+      });
+    })
+    .catch(()=>document.getElementById('orders-list').innerHTML='<p>Error loading orders.</p>');
 };
 
 // Init
