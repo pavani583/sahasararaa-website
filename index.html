@@ -1,218 +1,468 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Saree Boutique — Demo</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<style>
-  :root{--primary:#8b0000;--muted:#666}
-  body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
-  header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
-  header h1{margin:0;font-size:20px}
-  a{color:inherit;text-decoration:none}
-  .container{max-width:1100px;margin:18px auto;padding:0 12px}
-  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
-  img{max-width:100%;border-radius:6px}
-  .btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
-  input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
-  .muted{color:var(--muted)}
-  .flex{display:flex;gap:8px;align-items:center}
-</style>
+  <meta charset="utf-8" />
+  <title>SAHASR ARA — Collections</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --primary: #6a2ecc;       /* deep violet */
+      --accent:  #ff7aa2;       /* soft pink */
+      --bg:      #f6f5fb;
+      --card:    #ffffff;
+      --muted:   #6b6b6b;
+      --radius:  12px;
+      --gap:     12px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#111;-webkit-font-smoothing:antialiased}
+    /* Header */
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,var(--primary),#5633b1);color:#fff;position:sticky;top:0;z-index:40}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo {width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ffd1e8);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .brand h1{font-size:18px;margin:0}
+    /* header right */
+    .hdr-actions{display:flex;gap:10px;align-items:center}
+    .hdr-actions button, .hdr-actions a{background:transparent;border:none;color:#fff;cursor:pointer;font-weight:600}
+    .hamburger{width:40px;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer}
+    /* layout */
+    .wrap{max-width:1100px;margin:18px auto;padding:0 14px}
+    .top-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .search{flex:1;display:flex;gap:8px}
+    input.search-input{flex:1;padding:10px;border-radius:10px;border:1px solid #e6e4f2;background:#fff}
+    select, input, button{padding:10px;border-radius:10px;border:1px solid #e6e4f2;background:#fff}
+    button.primary{background:var(--primary);color:#fff;border:none;cursor:pointer}
+    .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid #eee;display:flex;flex-direction:column;gap:8px}
+    .card img{width:100%;height:220px;object-fit:cover;border-radius:8px}
+    .muted{color:var(--muted);font-size:13px}
+    .price{font-weight:700;color:var(--primary)}
+    .card .actions{display:flex;gap:8px;margin-top:auto}
+    .btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid #ddd}
+    /* product view */
+    .panel{background:var(--card);padding:12px;border-radius:12px;border:1px solid #eee}
+    /* Responsive */
+    @media (max-width:720px){
+      .card img{height:160px}
+      header .brand h1{font-size:16px}
+    }
+    /* Sidebar menu */
+    .sideback{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;z-index:50}
+    .sidemenu{position:fixed;right:0;top:0;height:100vh;width:300px;max-width:80vw;background:var(--card);box-shadow:-12px 0 30px rgba(0,0,0,0.08);padding:18px;transform:translateX(110%);transition:transform .28s ease;z-index:60;border-left:1px solid #eee}
+    .sidemenu.open{transform:translateX(0)}
+    .menu-item{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:10px;cursor:pointer}
+    .menu-item:hover{background:#f4f3fb}
+    .menu-title{font-weight:700}
+    /* small badges */
+    .badge{background:var(--accent);color:#fff;padding:4px 8px;border-radius:999px;font-size:12px}
+    /* nice footer small */
+    footer{padding:18px;text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  </style>
 </head>
 <body>
-<header>
-  <h1>Saree Boutique</h1>
-  <nav style="display:flex;gap:12px;align-items:center">
-    <span id="header-welcome" style="font-size:14px"></span>
-    <a href="#" id="link-home" style="color:#fff">Home</a>
-    <a href="#" id="link-cart" style="color:#fff">Cart (<span id="cart-count">0</span>)</a>
-    <a href="#" id="link-orders" style="color:#fff">Orders</a>
-    <a href="#" id="link-auth" style="color:#fff">Login/Register</a>
-    <a href="/admin.html" style="color:#fff">Admin</a>
+
+  <header>
+    <div class="brand">
+      <div class="logo">SR</div>
+      <h1>SAHASR ARA</h1>
+    </div>
+
+    <div class="hdr-actions">
+      <div id="header-welcome" style="font-weight:600;"></div>
+      <button id="open-menu" class="hamburger" title="Menu">☰</button>
+    </div>
+  </header>
+
+  <!-- slide-in menu -->
+  <div id="sideback" class="sideback" onclick="closeMenu()"></div>
+  <nav id="sidemenu" class="sidemenu" aria-hidden="true">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ffd1e8);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">SR</div>
+        <div>
+          <div style="font-weight:700">SAHASR ARA</div>
+          <div class="muted" style="font-size:13px">Clothing &amp; Collections</div>
+        </div>
+      </div>
+      <button onclick="closeMenu()" style="background:transparent;border:none;cursor:pointer">✕</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="menu-item" onclick="closeMenu(); renderApp();"><div>🏠</div><div class="menu-title">Home</div></div>
+      <div class="menu-item" onclick="closeMenu(); renderCart();"><div>🛒</div><div class="menu-title">Cart <span id="menu-cart-badge" class="badge" style="margin-left:8px;display:inline-block">0</span></div></div>
+      <div class="menu-item" onclick="closeMenu(); renderOrders();"><div>📦</div><div class="menu-title">My Orders</div></div>
+      <div class="menu-item" onclick="closeMenu(); renderWishlist();"><div>💖</div><div class="menu-title">Wishlist</div></div>
+      <div class="menu-item" onclick="closeMenu(); renderAuth();"><div>🔐</div><div class="menu-title" id="menu-auth-title">Login / Register</div></div>
+      <div class="menu-item" onclick="closeMenu(); window.location.href='admin.html';"><div>⚙️</div><div class="menu-title">Admin Panel</div></div>
+    </div>
+
+    <hr style="margin:12px 0;border:none;border-top:1px solid #f0eef8" />
+
+    <div style="font-size:13px;color:var(--muted)">Quick filters</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn" onclick="applyFilter('Silk')">Silk</button>
+      <button class="btn" onclick="applyFilter('Banarasi')">Banarasi</button>
+      <button class="btn" onclick="applyFilter('Cotton')">Cotton</button>
+      <button class="btn" onclick="applyFilter('Pattu')">Pattu</button>
+    </div>
+
+    <div style="margin-top:18px;color:var(--muted);font-size:13px">Protip: Replace sample images from admin panel.</div>
   </nav>
-</header>
-<div id="root" class="container"></div>
 
-<script>
-  const e = React.createElement;
-  const API = '/api';
+  <main class="wrap">
+    <div class="top-controls">
+      <div class="search">
+        <input id="searchInput" class="search-input" placeholder="Search sarees, colors, categories..." />
+        <select id="filterCategory" style="width:180px;">
+          <option value="">All categories</option>
+          <option>Silk</option>
+          <option>Banarasi</option>
+          <option>Cotton</option>
+          <option>Pattu</option>
+        </select>
+        <button class="primary" id="btnSearch">Search</button>
+      </div>
 
-  function setAuth(token, user){
-    if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
-    if (user) localStorage.setItem('user', JSON.stringify(user)); else localStorage.removeItem('user');
-    window.appState.token = token;
-    window.appState.user = user;
-    updateHeader();
-  }
-  function getToken(){ return localStorage.getItem('token'); }
-  function getUser(){ return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; }
-  window.appState = { token: getToken(), user: getUser() };
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn ghost" onclick="renderWishlist()">Wishlist (<span id="wish-count">0</span>)</button>
+        <button class="btn ghost" onclick="renderCart()">Cart (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
 
-  function updateHeader(){
-    const welcome = document.getElementById('header-welcome');
-    const authLink = document.getElementById('link-auth');
-    if (window.appState.user) {
-      welcome.textContent = 'Hi, ' + window.appState.user.name;
-      authLink.textContent = 'Logout';
-    } else {
-      welcome.textContent = '';
-      authLink.textContent = 'Login/Register';
+    <section id="root">
+      <!-- content rendered here -->
+    </section>
+
+    <footer>© SAHASR ARA • Built with ❤️ — Replace sample images & prices easily via Admin</footer>
+  </main>
+
+  <script>
+    /* ============================
+       LocalStorage keys & seed
+       ============================ */
+    const KEY_PRODUCTS = 'sahasrara_products_v1';
+    const KEY_CART = 'sahasrara_cart_v1';
+    const KEY_ORDERS = 'sahasrara_orders_v1';
+    const KEY_USER = 'sahasrara_user_v1';
+    const KEY_WISHLIST = 'sahasrara_wish_v1';
+
+    // seed sample products if not present
+    function seedProducts(){
+      if (localStorage.getItem(KEY_PRODUCTS)) return;
+      const sample = [
+        { id: 'p1', name: 'Elegant Kanchipuram Silk Saree', price: 3999, images: ['https://images.unsplash.com/photo-1600180758895-1b66b8b3b6e6?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=7b674b2b5206f7b14ebf1a8a2d6bfe3c'], desc: 'Traditional Kanchipuram silk with rich border', category: 'Silk', color: 'Maroon' },
+        { id: 'p2', name: 'Banarasi Heritage Saree', price: 4599, images: ['https://images.unsplash.com/photo-1562158070-1f6a9b1f3bfc?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=b6be4d6f2b0f1b9f168a4d9fd2ec8b6e'], desc: 'Banarasi weaving with gold thread', category: 'Banarasi', color: 'Gold' },
+        { id: 'p3', name: 'Soft Cotton Everyday Saree', price: 1299, images: ['https://images.unsplash.com/photo-1543168256-78c1a440f6ce?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=5d7b6f8c0a9f4db4c2f6d1c8e0a219a0'], desc: 'Comfortable cotton for daily wear', category: 'Cotton', color: 'Blue' },
+        { id: 'p4', name: 'Pattu Festive Saree', price: 2999, images: ['https://images.unsplash.com/photo-1520975916374-0f5d1a2b6f8a?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=0d3bf2e7a6e1f3d5c9b7f4a2d1a6d7c8'], desc: 'Pattu saree with bright hues', category: 'Pattu', color: 'Pink' }
+      ];
+      localStorage.setItem(KEY_PRODUCTS, JSON.stringify(sample));
     }
-    fetchCartCount();
-  }
 
-  document.getElementById('link-home').addEventListener('click', (ev)=>{ ev.preventDefault(); renderApp(); });
-  document.getElementById('link-cart').addEventListener('click', (ev)=>{ ev.preventDefault(); renderCart(); });
-  document.getElementById('link-orders').addEventListener('click', (ev)=>{ ev.preventDefault(); renderOrders(); });
-  document.getElementById('link-auth').addEventListener('click', (ev)=>{ ev.preventDefault(); if (window.appState.user) { setAuth(null,null); alert('Logged out'); renderApp(); } else renderAuth(); });
+    seedProducts();
 
-  function fetchCartCount(){
-    const el = document.getElementById('cart-count');
-    if (!window.appState.token){ el.textContent = '0'; return; }
-    fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(data => {
-        const n = data.items ? data.items.reduce((s,i)=>s+i.qty,0) : 0;
-        el.textContent = n;
-      }).catch(()=>el.textContent='0');
-  }
+    /* ============================
+       App state helpers
+       ============================ */
+    function getProducts(){ try{ return JSON.parse(localStorage.getItem(KEY_PRODUCTS) || '[]') } catch(e){ return [] } }
+    function setProducts(list){ localStorage.setItem(KEY_PRODUCTS, JSON.stringify(list)) }
+    function getCart(){ return JSON.parse(localStorage.getItem(KEY_CART) || '{"items":[]}') }
+    function setCart(cart){ localStorage.setItem(KEY_CART, JSON.stringify(cart)) }
+    function getOrders(){ return JSON.parse(localStorage.getItem(KEY_ORDERS) || '[]') }
+    function setOrders(list){ localStorage.setItem(KEY_ORDERS, JSON.stringify(list)) }
+    function getUser(){ return JSON.parse(localStorage.getItem(KEY_USER) || 'null') }
+    function setUser(u){ if(u) localStorage.setItem(KEY_USER, JSON.stringify(u)); else localStorage.removeItem(KEY_USER) }
+    function getWish(){ return JSON.parse(localStorage.getItem(KEY_WISHLIST) || '[]') }
+    function setWish(list){ localStorage.setItem(KEY_WISHLIST, JSON.stringify(list)) }
 
-  function renderApp(){
-    const container = document.getElementById('root');
-    container.innerHTML = '<h2>Collections</h2><div class="panel"><input id="search" placeholder="Search sarees"/><div style="display:flex;gap:8px"><select id="cat"><option value="">All</option><option>Silk</option><option>Pattu</option><option>Banarasi</option><option>Cotton</option></select><button class="btn" id="btn-search">Search</button></div></div><div id="list" style="margin-top:12px" class="grid"></div>';
-    document.getElementById('btn-search').addEventListener('click', loadProducts);
-    loadProducts();
-  }
+    // header update
+    function updateHeader(){
+      const user = getUser();
+      document.getElementById('header-welcome').textContent = user ? ('Hi, ' + user.name) : '';
+      document.getElementById('cart-count').textContent = getCart().items.reduce((s,i)=>s+i.qty,0);
+      document.getElementById('wish-count').textContent = getWish().length;
+      document.getElementById('menu-cart-badge').textContent = getCart().items.reduce((s,i)=>s+i.qty,0);
+      document.getElementById('menu-auth-title').textContent = user ? 'Logout' : 'Login / Register';
+    }
 
-  function loadProducts(){
-    const q = document.getElementById('search').value || '';
-    const cat = document.getElementById('cat').value || '';
-    let url = API + '/products';
-    const params = [];
-    if (q) params.push('q=' + encodeURIComponent(q));
-    if (cat) params.push('category=' + encodeURIComponent(cat));
-    if (params.length) url += '?' + params.join('&');
-    fetch(url).then(r=>r.json()).then(list=>{
-      const wrap = document.getElementById('list'); wrap.innerHTML = '';
-      list.forEach(p=>{
-        const card = document.createElement('div'); card.className='card';
-        card.innerHTML = `
-          <img src="${(p.images && p.images[0]) ? p.images[0] : 'https://via.placeholder.com/500x350?text=' + encodeURIComponent(p.name)}" />
-          <h3>${p.name}</h3>
-          <div class="muted">₹${p.price}</div>
-          <div class="muted small">${p.desc || ''}</div>
-          <div style="margin-top:8px" class="flex">
-            <button class="btn" onclick="viewProduct('${p.id}')">View</button>
-            <button class="btn" onclick="addToCart('${p.id}',1)" style="background:#333">Add to Cart</button>
+    /* ============================
+       Menu open/close
+       ============================ */
+    const sideback = document.getElementById('sideback');
+    const sidemenu = document.getElementById('sidemenu');
+    document.getElementById('open-menu').addEventListener('click', openMenu);
+    function openMenu(){ sideback.style.display='block'; sidemenu.classList.add('open'); sidemenu.setAttribute('aria-hidden','false') }
+    function closeMenu(){ sideback.style.display='none'; sidemenu.classList.remove('open'); sidemenu.setAttribute('aria-hidden','true') }
+
+    /* ============================
+       Render functions
+       ============================ */
+    function renderApp(){
+      closeMenu();
+      const root = document.getElementById('root');
+      root.innerHTML = `<h2 style="margin-top:6px">Collections</h2>
+        <div id="products" class="grid" style="margin-top:12px"></div>`;
+      loadProducts();
+      updateHeader();
+    }
+
+    // loadProducts with search & category
+    function loadProducts(){
+      const q = (document.getElementById('searchInput')||{}).value || '';
+      const cat = (document.getElementById('filterCategory')||{}).value || '';
+      let list = getProducts();
+      if (q) {
+        const ql = q.toLowerCase();
+        list = list.filter(p => (p.name||'').toLowerCase().includes(ql) || (p.desc||'').toLowerCase().includes(ql) || (p.color||'').toLowerCase().includes(ql));
+      }
+      if (cat) list = list.filter(p => p.category === cat);
+      const wrap = document.getElementById('products');
+      wrap.innerHTML = '';
+      if (!list.length) { wrap.innerHTML = '<div class="panel">No products found</div>'; return; }
+      list.forEach(p => {
+        const item = document.createElement('div'); item.className='card';
+        item.innerHTML = `
+          <img src="${p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/800x600?text=Image'}" alt="${p.name}">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:700">${p.name}</div>
+              <div class="price">₹${p.price}</div>
+            </div>
+            <div class="muted">${p.category} • ${p.color || ''}</div>
+            <div style="font-size:14px;margin-top:6px">${(p.desc||'').slice(0,90)}</div>
+            <div class="actions">
+              <button class="btn primary" onclick="viewProduct('${p.id}')">View</button>
+              <button class="btn" onclick="addToCart('${p.id}',1)" title="Add to cart" style="background:#333;color:#fff;border-radius:8px">Add to Cart</button>
+              <button class="btn ghost" onclick="toggleWish('${p.id}')">♡</button>
+            </div>
           </div>
         `;
-        wrap.appendChild(card);
+        wrap.appendChild(item);
       });
-    });
-  }
+    }
 
-  window.viewProduct = function(id){
-    fetch(API + '/products/' + id).then(r=>r.json()).then(p=>{
+    function applyFilter(cat){ document.getElementById('filterCategory').value = cat; loadProducts(); closeMenu(); }
+
+    window.viewProduct = function(id){
+      const p = getProducts().find(x=>x.id===id);
       const root = document.getElementById('root');
-      root.innerHTML = '<div style="display:flex;gap:12px"><div style="flex:1"><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/600x600')+'" style="width:100%;height:auto;border-radius:6px"/></div><div style="flex:1"><h2>'+p.name+'</h2><div class="muted">₹'+p.price+'</div><p>'+ (p.desc||'') +'</p><div class="muted">Category: '+p.category+' | Color: '+p.color+'</div><div style="margin-top:12px"><button class="btn" onclick="addToCart(\''+p.id+'\',1)">Add to Cart</button><button class="btn" onclick="buyNow(\''+p.id+'\')">Buy Now</button></div></div></div>';
-    });
-  };
+      if (!p) { root.innerHTML = '<div class="panel">Product not found</div>'; return; }
+      root.innerHTML = `<div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:1fr;gap:10px">
+          <img src="${p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/900x900'}" style="width:100%;height:auto;border-radius:12px">
+        </div>
+        <div class="panel">
+          <h2 style="margin:0">${p.name}</h2>
+          <div class="muted">Category: ${p.category} • Color: ${p.color || ''}</div>
+          <div style="margin-top:8px" class="price">₹${p.price}</div>
+          <p style="margin-top:8px">${p.desc || ''}</p>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn primary" onclick="addToCart('${p.id}',1)">Add to Cart</button>
+            <button class="btn" onclick="buyNow('${p.id}')">Buy Now</button>
+            <button class="btn ghost" onclick="toggleWish('${p.id}')">Add to Wishlist</button>
+          </div>
+        </div>
+      </div>`;
+    };
 
-  window.addToCart = function(productId, qty){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { method:'POST', headers: { 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty }) })
-      .then(r=>r.json()).then(res=>{ alert(res.message || 'Added'); fetchCartCount(); }).catch(()=>alert('Error'));
-  };
+    /* ============================
+       Cart & Wishlist
+       ============================ */
+    window.addToCart = function(productId, qty){
+      const user = getUser();
+      if (!user) { alert('Please login/register to add to cart'); renderAuth(); return; }
+      const cart = getCart();
+      const existing = cart.items.find(i=>i.productId === productId);
+      if (existing) existing.qty += qty; else cart.items.push({ productId, qty });
+      setCart(cart);
+      updateHeader();
+      alert('Added to cart');
+    };
 
-  window.buyNow = function(productId){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty:1 }) })
-      .then(()=> renderCart());
-  };
+    window.buyNow = function(productId){
+      const user = getUser();
+      if (!user) { alert('Please login/register to buy'); renderAuth(); return; }
+      // ensure item in cart then go to checkout UI
+      addToCart(productId,1);
+      renderCart();
+      renderCheckout();
+    };
 
-  function renderCart(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(data=>{
-        const root = document.getElementById('root');
-        let html = '<h2>Your Cart</h2>';
-        if (!data.items || data.items.length===0) { root.innerHTML = html + '<div class="panel">Cart empty</div>'; return; }
-        html += '<div class="panel">';
+    function renderCart(){
+      const user = getUser();
+      if (!user) { alert('Please login/register'); renderAuth(); return; }
+      const cart = getCart();
+      const root = document.getElementById('root');
+      if (!cart.items.length) { root.innerHTML = '<h2>Your Cart</h2><div class="panel">Cart is empty</div>'; return; }
+      let html = '<h2>Your Cart</h2><div class="panel">';
+      let total = 0;
+      cart.items.forEach(it => {
+        const p = getProducts().find(x=>x.id===it.productId) || {};
+        const sub = (p.price || 0) * it.qty; total += sub;
+        html += `<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+          <div style="flex:1"><b>${p.name || ''}</b><div class="muted">₹${p.price||0}</div></div>
+          <div>Qty: ${it.qty}</div>
+          <div><button class="btn ghost" onclick="removeCart('${it.productId}')">Remove</button></div>
+        </div>`;
+      });
+      html += `<hr><div style="display:flex;justify-content:space-between;align-items:center"><div><b>Total:</b> ₹${total}</div><div><button class="btn primary" onclick="renderCheckout()">Checkout (Cash on Delivery)</button></div></div></div>`;
+      root.innerHTML = html;
+    }
+
+    window.removeCart = function(productId){
+      const cart = getCart();
+      cart.items = cart.items.filter(i=>i.productId !== productId);
+      setCart(cart);
+      updateHeader();
+      renderCart();
+    };
+
+    function renderCheckout(){
+      const user = getUser();
+      if (!user) { alert('Please login/register'); renderAuth(); return; }
+      const shipping = user || { name: '', mobile: '' };
+      const root = document.getElementById('root');
+      root.innerHTML = `<h2>Checkout</h2>
+        <div class="panel">
+          <input id="ship-name" placeholder="Name" value="${shipping.name||''}" />
+          <input id="ship-mobile" placeholder="Mobile" value="${shipping.mobile||''}" />
+          <input id="ship-address" placeholder="Address" />
+          <input id="ship-city" placeholder="City" />
+          <input id="ship-pincode" placeholder="Pincode" />
+          <div style="margin-top:10px"><button class="btn primary" id="place-order-btn">Place Order (COD)</button></div>
+        </div>`;
+      document.getElementById('place-order-btn').addEventListener('click', ()=> {
+        const ship = {
+          name: document.getElementById('ship-name').value.trim(),
+          mobile: document.getElementById('ship-mobile').value.trim(),
+          address: document.getElementById('ship-address').value.trim(),
+          city: document.getElementById('ship-city').value.trim(),
+          pincode: document.getElementById('ship-pincode').value.trim()
+        };
+        if (!ship.name || !ship.mobile || !ship.address || !ship.city || !ship.pincode) return alert('Please fill all fields');
+        // create order
+        const cart = getCart();
+        if (!cart.items.length) return alert('Cart empty');
         let total = 0;
-        data.items.forEach(it => {
-          const p = it.product || {};
-          const sub = (p.price||0) * it.qty; total += sub;
-          html += '<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><div style="flex:1"><b>'+ (p.name||'') +'</b><div class="muted">₹'+(p.price||0)+'</div></div><div>Qty: '+it.qty+'</div><div><button class="btn" onclick="removeCart(\''+(p.id||'')+'\')">Remove</button></div></div>';
+        const items = cart.items.map(it => {
+          const p = getProducts().find(x=>x.id===it.productId) || {};
+          total += (p.price||0) * it.qty;
+          return { productId: it.productId, qty: it.qty, price: p.price || 0, name: p.name || '' };
         });
-        html += '<hr><div><b>Total: ₹'+total+'</b></div><div style="margin-top:8px"><button class="btn" onclick="renderCheckout()">Checkout (Cash on Delivery)</button></div></div>';
-        root.innerHTML = html;
+        const orders = getOrders();
+        const order = { id: 'ORD' + Date.now(), items, totalAmount: total, shipping: ship, createdAt: (new Date()).toISOString(), paymentMode: 'COD', orderStatus: 'Placed' };
+        orders.unshift(order);
+        setOrders(orders);
+        // clear cart
+        setCart({ items: [] });
+        updateHeader();
+        alert('Order placed: ' + order.id);
+        renderOrders();
       });
-  }
+    }
 
-  window.removeCart = function(productId){
-    fetch(API + '/cart/' + productId, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(res=>{ alert(res.message); renderCart(); fetchCartCount(); });
-  };
-
-  // Checkout collects full address (name,mobile,address,city,pincode)
-  window.renderCheckout = function(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    const root = document.getElementById('root');
-    root.innerHTML = '<h2>Checkout (Cash on Delivery)</h2><div class="panel"><input id="ship-name" placeholder="Name" value="'+(window.appState.user?window.appState.user.name:'')+'"/><input id="ship-mobile" placeholder="Mobile" value="'+(window.appState.user?window.appState.user.mobile:'')+'"/><input id="ship-address" placeholder="Address"/><input id="ship-city" placeholder="City"/><input id="ship-pincode" placeholder="Pincode"/><button class="btn" id="btn-place">Place Order</button></div>';
-    document.getElementById('btn-place').addEventListener('click', ()=>{
-      const shipping = {
-        name: document.getElementById('ship-name').value.trim(),
-        mobile: document.getElementById('ship-mobile').value.trim(),
-        address: document.getElementById('ship-address').value.trim(),
-        city: document.getElementById('ship-city').value.trim(),
-        pincode: document.getElementById('ship-pincode').value.trim()
-      };
-      if (!shipping.name||!shipping.mobile||!shipping.address||!shipping.city||!shipping.pincode) return alert('Please fill all fields');
-      fetch(API + '/order', { method:'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.appState.token }, body: JSON.stringify({ shipping }) })
-        .then(r=>r.json()).then(res=>{ if (res.order) { alert('Order placed: ' + res.order.id); renderOrders(); fetchCartCount(); } else alert(res.message || 'Error'); });
-    });
-  };
-
-  function renderOrders(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/orders', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(list=>{
-        const root = document.getElementById('root');
-        let html = '<h2>Your Orders</h2><div class="panel">';
-        if (!list || list.length===0) html += 'No orders yet';
-        else {
-          list.forEach(o=>{
-            html += '<div style="border-bottom:1px dashed #ddd;padding:8px 0"><b>Order: '+o.id+'</b><div class="muted">Placed: '+ new Date(o.createdAt).toLocaleString() +'</div><div>Total: ₹'+o.totalAmount+'</div><div>Payment: '+o.paymentMode+' | Status: '+o.orderStatus+'</div><div class="muted">Ship to: '+o.shipping.name+', '+o.shipping.address+', '+o.shipping.city+' - '+o.shipping.pincode+'</div></div>';
-          });
-        }
-        html += '</div>';
-        root.innerHTML = html;
+    function renderOrders(){
+      const user = getUser();
+      if (!user) { alert('Please login/register'); renderAuth(); return; }
+      const list = getOrders();
+      const root = document.getElementById('root');
+      if (!list.length) { root.innerHTML = '<h2>Your Orders</h2><div class="panel">No orders yet</div>'; return; }
+      let html = '<h2>Your Orders</h2><div class="panel">';
+      list.forEach(o=>{
+        html += `<div style="border-bottom:1px dashed #eee;padding:10px 0">
+          <div style="display:flex;justify-content:space-between"><div><b>Order: ${o.id}</b></div><div class="muted">${new Date(o.createdAt).toLocaleString()}</div></div>
+          <div style="margin-top:6px">Total: ₹${o.totalAmount} • ${o.paymentMode} • Status: ${o.orderStatus}</div>
+          <div class="muted" style="margin-top:6px">Ship: ${o.shipping.name}, ${o.shipping.address}, ${o.shipping.city} - ${o.shipping.pincode}</div>
+        </div>`;
       });
-  }
+      html += '</div>';
+      root.innerHTML = html;
+    }
 
-  function renderAuth(){
-    const root = document.getElementById('root');
-    root.innerHTML = '<h2>Login / Register</h2><div class="panel"><h3>Register</h3><input id="reg-name" placeholder="Name"/><input id="reg-mobile" placeholder="Mobile"/><button class="btn" id="btn-reg">Register</button><hr/><h3>Login</h3><input id="login-mobile" placeholder="Mobile"/><button class="btn" id="btn-login">Login</button></div>';
-    document.getElementById('btn-reg').addEventListener('click', ()=>{
-      const name = document.getElementById('reg-name').value.trim();
-      const mobile = document.getElementById('reg-mobile').value.trim();
-      if (!name || !mobile) return alert('name & mobile required');
-      fetch(API + '/auth/register', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name, mobile }) })
-        .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Registered'); renderApp(); } else alert(res.message || 'Error'); });
-    });
-    document.getElementById('btn-login').addEventListener('click', ()=>{
-      const mobile = document.getElementById('login-mobile').value.trim();
-      if (!mobile) return alert('mobile required');
-      fetch(API + '/auth/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ mobile }) })
-        .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Logged in'); renderApp(); } else alert(res.message || 'Error'); });
-    });
-  }
+    /* ============================
+       Wishlist
+       ============================ */
+    function toggleWish(productId){
+      const user = getUser();
+      if (!user) { alert('Please login/register'); renderAuth(); return; }
+      let wish = getWish();
+      if (wish.includes(productId)) wish = wish.filter(x=>x!==productId);
+      else wish.push(productId);
+      setWish(wish);
+      updateHeader();
+      alert('Wishlist updated');
+    }
 
-  // Init
-  updateHeader();
-  renderApp();
-</script>
+    function renderWishlist(){
+      const user = getUser();
+      if (!user) { alert('Please login/register'); renderAuth(); return; }
+      const wish = getWish();
+      const root = document.getElementById('root');
+      if (!wish.length) { root.innerHTML = '<h2>Wishlist</h2><div class="panel">No items yet</div>'; return; }
+      const items = getProducts().filter(p=>wish.includes(p.id));
+      let html = '<h2>Wishlist</h2><div class="grid" style="margin-top:12px">';
+      items.forEach(p => {
+        html += `<div class="card">
+          <img src="${p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/800x600'}" alt="${p.name}">
+          <div><b>${p.name}</b><div class="muted">₹${p.price}</div></div>
+          <div style="margin-top:8px"><button class="btn primary" onclick="addToCart('${p.id}',1)">Add to Cart</button></div>
+        </div>`;
+      });
+      html += '</div>';
+      root.innerHTML = html;
+    }
+
+    /* ============================
+       Auth (simple localStorage)
+       ============================ */
+    function renderAuth(){
+      closeMenu();
+      const root = document.getElementById('root');
+      root.innerHTML = `<h2>Login / Register</h2>
+        <div class="panel" style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:700">Register</div>
+          <input id="reg-name" placeholder="Your name" />
+          <input id="reg-mobile" placeholder="Mobile number" />
+          <button id="btn-reg" class="btn primary">Register</button>
+          <hr />
+          <div style="font-weight:700">Login</div>
+          <input id="login-mobile" placeholder="Mobile number" />
+          <button id="btn-login" class="btn primary">Login</button>
+        </div>`;
+      document.getElementById('btn-reg').addEventListener('click', ()=>{
+        const name = document.getElementById('reg-name').value.trim();
+        const mobile = document.getElementById('reg-mobile').value.trim();
+        if (!name || !mobile) return alert('Name & mobile required');
+        setUser({ name, mobile });
+        alert('Registered as ' + name);
+        updateHeader();
+        renderApp();
+      });
+      document.getElementById('btn-login').addEventListener('click', ()=>{
+        const mobile = document.getElementById('login-mobile').value.trim();
+        if (!mobile) return alert('Mobile required');
+        // very simple: we accept any mobile as login
+        setUser({ name: 'User', mobile });
+        alert('Logged in');
+        updateHeader();
+        renderApp();
+      });
+    }
+
+    /* ============================
+       Utility & init
+       ============================ */
+    document.getElementById('btnSearch').addEventListener('click', ()=>{ loadProducts(); });
+    document.getElementById('searchInput').addEventListener('keyup', (e)=>{ if (e.key === 'Enter') loadProducts(); });
+    // navbar menu auth toggle: if user logged in, clicking menu auth logs out
+    document.querySelector('[onclick*="renderAuth()"]').addEventListener('click', ()=>{
+      const user = getUser();
+      if (user) { setUser(null); alert('Logged out'); updateHeader(); renderApp(); }
+    });
+
+    // initial render
+    updateHeader();
+    renderApp();
+  </script>
 </body>
 </html>
