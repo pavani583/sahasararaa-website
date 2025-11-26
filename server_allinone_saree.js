@@ -72,7 +72,8 @@ app.post('/api/auth/register', (req, res) => {
   if (!name || !mobile) return res.status(400).json({ message: 'name and mobile required' });
   const d = readData();
   if (d.users.find(u => u.mobile === mobile)) return res.status(400).json({ message: 'Mobile already registered' });
-  const user = { id: uuidv4(), name, mobile, isAdmin: false };
+  const adminMobiles = ['8050990669']; // set your admin number(s)
+  const user = { id: uuidv4(), name, mobile, isAdmin: adminMobiles.includes(mobile) };
   d.users.push(user);
   writeData(d);
   const token = generateToken(user);
