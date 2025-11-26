@@ -7,214 +7,250 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <style>
-  :root{--primary:#8b0000;--muted:#666}
-  body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
-  header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
-  header h1{margin:0;font-size:20px}
-  a{color:inherit;text-decoration:none}
-  .container{max-width:1100px;margin:18px auto;padding:0 12px}
-  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
-  img{max-width:100%;border-radius:6px}
-  .btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
-  input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
-  .muted{color:var(--muted)}
-  .flex{display:flex;gap:8px;align-items:center}
+:root{--primary:#8b0000;--muted:#666}
+body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#fff;color:#111}
+header{background:var(--primary);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:relative}
+header h1{margin:0;font-size:20px}
+a{color:inherit;text-decoration:none}
+.container{max-width:1100px;margin:18px auto;padding:0 12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{border:1px solid #eee;border-radius:8px;padding:10px;background:#fafafa}
+img{max-width:100%;border-radius:6px}
+.btn{background:var(--primary);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+input,select,textarea{padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;box-sizing:border-box;margin:6px 0}
+.muted{color:var(--muted)}
+.flex{display:flex;gap:8px;align-items:center}
+
+/* Hamburger Menu */
+.menu-btn{display:none;flex-direction:column;gap:4px;cursor:pointer}
+.menu-btn div{width:25px;height:3px;background:#fff}
+.nav-links{display:flex;gap:12px;align-items:center}
+.nav-links a{color:#fff}
+.nav-links.show{display:flex;flex-direction:column;position:absolute;top:60px;left:0;width:100%;background:var(--primary);padding:10px;gap:10px}
+@media (max-width:768px){
+  .nav-links{display:none}
+  .menu-btn{display:flex}
+}
+#hero{background:#f8f8f8;padding:40px 12px;text-align:center;margin-bottom:12px;border-radius:8px}
+#hero h2{margin:0;font-size:28px;margin-bottom:12px}
+#hero button{margin-top:12px}
 </style>
 </head>
 <body>
+
 <header>
   <div style="display:flex;align-items:center;gap:12px">
     <img src="/images/SASRS_logo.png" alt="Sahasrara Logo" style="height:50px;">
-  <h1>SAHASARARAA</h1>
-  <nav style="display:flex;gap:12px;align-items:center">
+    <h1>SAHASARARAA</h1>
+  </div>
+  <div class="menu-btn" id="menu-toggle">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+  <nav class="nav-links" id="nav-links">
     <span id="header-welcome" style="font-size:14px"></span>
-    <a href="#" id="link-home" style="color:#fff">Home</a>
-    <a href="#" id="link-cart" style="color:#fff">Cart (<span id="cart-count">0</span>)</a>
-    <a href="#" id="link-orders" style="color:#fff">Orders</a>
-    <a href="#" id="link-auth" style="color:#fff">Login/Register</a>
-    <a href="/admin.html" style="color:#fff">Admin</a>
+    <a href="#" id="link-home">Home</a>
+    <a href="#" id="link-cart">Cart (<span id="cart-count">0</span>)</a>
+    <a href="#" id="link-orders">Orders</a>
+    <a href="#" id="link-auth">Login/Register</a>
+    <a href="/admin.html">Admin</a>
   </nav>
 </header>
+
+<div id="hero">
+  <h2>Welcome to SAHASARARAA</h2>
+  <p>Explore our exquisite saree collections!</p>
+  <button class="btn" onclick="renderApp()">Shop Now</button>
+</div>
+
 <div id="root" class="container"></div>
 
 <script>
-  const e = React.createElement;
-  const API = '/api';
+const API = '/api';
 
-  function setAuth(token, user){
-    if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
-    if (user) localStorage.setItem('user', JSON.stringify(user)); else localStorage.removeItem('user');
-    window.appState.token = token;
-    window.appState.user = user;
-    updateHeader();
-  }
-  function getToken(){ return localStorage.getItem('token'); }
-  function getUser(){ return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; }
-  window.appState = { token: getToken(), user: getUser() };
-
-  function updateHeader(){
-    const welcome = document.getElementById('header-welcome');
-    const authLink = document.getElementById('link-auth');
-    if (window.appState.user) {
-      welcome.textContent = 'Hi, ' + window.appState.user.name;
-      authLink.textContent = 'Logout';
-    } else {
-      welcome.textContent = '';
-      authLink.textContent = 'Login/Register';
-    }
-    fetchCartCount();
-  }
-
-  document.getElementById('link-home').addEventListener('click', (ev)=>{ ev.preventDefault(); renderApp(); });
-  document.getElementById('link-cart').addEventListener('click', (ev)=>{ ev.preventDefault(); renderCart(); });
-  document.getElementById('link-orders').addEventListener('click', (ev)=>{ ev.preventDefault(); renderOrders(); });
-  document.getElementById('link-auth').addEventListener('click', (ev)=>{ ev.preventDefault(); if (window.appState.user) { setAuth(null,null); alert('Logged out'); renderApp(); } else renderAuth(); });
-
-  function fetchCartCount(){
-    const el = document.getElementById('cart-count');
-    if (!window.appState.token){ el.textContent = '0'; return; }
-    fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(data => {
-        const n = data.items ? data.items.reduce((s,i)=>s+i.qty,0) : 0;
-        el.textContent = n;
-      }).catch(()=>el.textContent='0');
-  }
-
-  function renderApp(){
-    const container = document.getElementById('root');
-    container.innerHTML = '<h2>Collections</h2><div class="panel"><input id="search" placeholder="Search sarees"/><div style="display:flex;gap:8px"><select id="cat"><option value="">All</option><option>Silk</option><option>Pattu</option><option>Banarasi</option><option>Cotton</option></select><button class="btn" id="btn-search">Search</button></div></div><div id="list" style="margin-top:12px" class="grid"></div>';
-    document.getElementById('btn-search').addEventListener('click', loadProducts);
-    loadProducts();
-  }
-
-  function loadProducts(){
-    const q = document.getElementById('search').value || '';
-    const cat = document.getElementById('cat').value || '';
-    let url = API + '/products';
-    const params = [];
-    if (q) params.push('q=' + encodeURIComponent(q));
-    if (cat) params.push('category=' + encodeURIComponent(cat));
-    if (params.length) url += '?' + params.join('&');
-    fetch(url).then(r=>r.json()).then(list=>{
-      const wrap = document.getElementById('list'); wrap.innerHTML = '';
-      list.forEach(p=>{
-        const card = document.createElement('div'); card.className='card';
-        card.innerHTML = `
-          <img src="${(p.images && p.images[0]) ? p.images[0] : 'https://via.placeholder.com/500x350?text=' + encodeURIComponent(p.name)}" />
-          <h3>${p.name}</h3>
-          <div class="muted">₹${p.price}</div>
-          <div class="muted small">${p.desc || ''}</div>
-          <div style="margin-top:8px" class="flex">
-            <button class="btn" onclick="viewProduct('${p.id}')">View</button>
-            <button class="btn" onclick="addToCart('${p.id}',1)" style="background:#333">Add to Cart</button>
-          </div>
-        `;
-        wrap.appendChild(card);
-      });
-    });
-  }
-
-  window.viewProduct = function(id){
-    fetch(API + '/products/' + id).then(r=>r.json()).then(p=>{
-      const root = document.getElementById('root');
-      root.innerHTML = '<div style="display:flex;gap:12px"><div style="flex:1"><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/600x600')+'" style="width:100%;height:auto;border-radius:6px"/></div><div style="flex:1"><h2>'+p.name+'</h2><div class="muted">₹'+p.price+'</div><p>'+ (p.desc||'') +'</p><div class="muted">Category: '+p.category+' | Color: '+p.color+'</div><div style="margin-top:12px"><button class="btn" onclick="addToCart(\''+p.id+'\',1)">Add to Cart</button><button class="btn" onclick="buyNow(\''+p.id+'\')">Buy Now</button></div></div></div>';
-    });
-  };
-
-  window.addToCart = function(productId, qty){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { method:'POST', headers: { 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty }) })
-      .then(r=>r.json()).then(res=>{ alert(res.message || 'Added'); fetchCartCount(); }).catch(()=>alert('Error'));
-  };
-
-  window.buyNow = function(productId){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty:1 }) })
-      .then(()=> renderCart());
-  };
-
-  function renderCart(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(data=>{
-        const root = document.getElementById('root');
-        let html = '<h2>Your Cart</h2>';
-        if (!data.items || data.items.length===0) { root.innerHTML = html + '<div class="panel">Cart empty</div>'; return; }
-        html += '<div class="panel">';
-        let total = 0;
-        data.items.forEach(it => {
-          const p = it.product || {};
-          const sub = (p.price||0) * it.qty; total += sub;
-          html += '<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><div style="flex:1"><b>'+ (p.name||'') +'</b><div class="muted">₹'+(p.price||0)+'</div></div><div>Qty: '+it.qty+'</div><div><button class="btn" onclick="removeCart(\''+(p.id||'')+'\')">Remove</button></div></div>';
-        });
-        html += '<hr><div><b>Total: ₹'+total+'</b></div><div style="margin-top:8px"><button class="btn" onclick="renderCheckout()">Checkout (Cash on Delivery)</button></div></div>';
-        root.innerHTML = html;
-      });
-  }
-
-  window.removeCart = function(productId){
-    fetch(API + '/cart/' + productId, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(res=>{ alert(res.message); renderCart(); fetchCartCount(); });
-  };
-
-  // Checkout collects full address (name,mobile,address,city,pincode)
-  window.renderCheckout = function(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    const root = document.getElementById('root');
-    root.innerHTML = '<h2>Checkout (Cash on Delivery)</h2><div class="panel"><input id="ship-name" placeholder="Name" value="'+(window.appState.user?window.appState.user.name:'')+'"/><input id="ship-mobile" placeholder="Mobile" value="'+(window.appState.user?window.appState.user.mobile:'')+'"/><input id="ship-address" placeholder="Address"/><input id="ship-city" placeholder="City"/><input id="ship-pincode" placeholder="Pincode"/><button class="btn" id="btn-place">Place Order</button></div>';
-    document.getElementById('btn-place').addEventListener('click', ()=>{
-      const shipping = {
-        name: document.getElementById('ship-name').value.trim(),
-        mobile: document.getElementById('ship-mobile').value.trim(),
-        address: document.getElementById('ship-address').value.trim(),
-        city: document.getElementById('ship-city').value.trim(),
-        pincode: document.getElementById('ship-pincode').value.trim()
-      };
-      if (!shipping.name||!shipping.mobile||!shipping.address||!shipping.city||!shipping.pincode) return alert('Please fill all fields');
-      fetch(API + '/order', { method:'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.appState.token }, body: JSON.stringify({ shipping }) })
-        .then(r=>r.json()).then(res=>{ if (res.order) { alert('Order placed: ' + res.order.id); renderOrders(); fetchCartCount(); } else alert(res.message || 'Error'); });
-    });
-  };
-
-  function renderOrders(){
-    if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
-    fetch(API + '/orders', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
-      .then(r=>r.json()).then(list=>{
-        const root = document.getElementById('root');
-        let html = '<h2>Your Orders</h2><div class="panel">';
-        if (!list || list.length===0) html += 'No orders yet';
-        else {
-          list.forEach(o=>{
-            html += '<div style="border-bottom:1px dashed #ddd;padding:8px 0"><b>Order: '+o.id+'</b><div class="muted">Placed: '+ new Date(o.createdAt).toLocaleString() +'</div><div>Total: ₹'+o.totalAmount+'</div><div>Payment: '+o.paymentMode+' | Status: '+o.orderStatus+'</div><div class="muted">Ship to: '+o.shipping.name+', '+o.shipping.address+', '+o.shipping.city+' - '+o.shipping.pincode+'</div></div>';
-          });
-        }
-        html += '</div>';
-        root.innerHTML = html;
-      });
-  }
-
-  function renderAuth(){
-    const root = document.getElementById('root');
-    root.innerHTML = '<h2>Login / Register</h2><div class="panel"><h3>Register</h3><input id="reg-name" placeholder="Name"/><input id="reg-mobile" placeholder="Mobile"/><button class="btn" id="btn-reg">Register</button><hr/><h3>Login</h3><input id="login-mobile" placeholder="Mobile"/><button class="btn" id="btn-login">Login</button></div>';
-    document.getElementById('btn-reg').addEventListener('click', ()=>{
-      const name = document.getElementById('reg-name').value.trim();
-      const mobile = document.getElementById('reg-mobile').value.trim();
-      if (!name || !mobile) return alert('name & mobile required');
-      fetch(API + '/auth/register', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name, mobile }) })
-        .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Registered'); renderApp(); } else alert(res.message || 'Error'); });
-    });
-    document.getElementById('btn-login').addEventListener('click', ()=>{
-      const mobile = document.getElementById('login-mobile').value.trim();
-      if (!mobile) return alert('mobile required');
-      fetch(API + '/auth/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ mobile }) })
-        .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Logged in'); renderApp(); } else alert(res.message || 'Error'); });
-    });
-  }
-
-  // Init
+function setAuth(token, user){
+  if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
+  if (user) localStorage.setItem('user', JSON.stringify(user)); else localStorage.removeItem('user');
+  window.appState.token = token;
+  window.appState.user = user;
   updateHeader();
-  renderApp();
+}
+
+function getToken(){ return localStorage.getItem('token'); }
+function getUser(){ return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null; }
+window.appState = { token: getToken(), user: getUser() };
+
+function updateHeader(){
+  const welcome = document.getElementById('header-welcome');
+  const authLink = document.getElementById('link-auth');
+  if (window.appState.user) {
+    welcome.textContent = 'Hi, ' + window.appState.user.name;
+    authLink.textContent = 'Logout';
+  } else {
+    welcome.textContent = '';
+    authLink.textContent = 'Login/Register';
+  }
+  fetchCartCount();
+}
+
+document.getElementById('link-home').addEventListener('click', (ev)=>{ ev.preventDefault(); renderApp(); });
+document.getElementById('link-cart').addEventListener('click', (ev)=>{ ev.preventDefault(); renderCart(); });
+document.getElementById('link-orders').addEventListener('click', (ev)=>{ ev.preventDefault(); renderOrders(); });
+document.getElementById('link-auth').addEventListener('click', (ev)=>{ ev.preventDefault(); if (window.appState.user) { setAuth(null,null); alert('Logged out'); renderApp(); } else renderAuth(); });
+
+function fetchCartCount(){
+  const el = document.getElementById('cart-count');
+  if (!window.appState.token){ el.textContent = '0'; return; }
+  fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
+    .then(r=>r.json()).then(data => {
+      const n = data.items ? data.items.reduce((s,i)=>s+i.qty,0) : 0;
+      el.textContent = n;
+    }).catch(()=>el.textContent='0');
+}
+
+// Hamburger menu toggle
+document.getElementById('menu-toggle').addEventListener('click', ()=>{
+  const nav = document.getElementById('nav-links');
+  nav.classList.toggle('show');
+});
+
+// --- Existing functions --- //
+
+function renderApp(){
+  const container = document.getElementById('root');
+  container.innerHTML = '<h2>Collections</h2><div class="panel"><input id="search" placeholder="Search sarees"/><div style="display:flex;gap:8px"><select id="cat"><option value="">All</option><option>Silk</option><option>Pattu</option><option>Banarasi</option><option>Cotton</option></select><button class="btn" id="btn-search">Search</button></div></div><div id="list" style="margin-top:12px" class="grid"></div>';
+  document.getElementById('btn-search').addEventListener('click', loadProducts);
+  loadProducts();
+}
+
+function loadProducts(){
+  const q = document.getElementById('search').value || '';
+  const cat = document.getElementById('cat').value || '';
+  let url = API + '/products';
+  const params = [];
+  if (q) params.push('q=' + encodeURIComponent(q));
+  if (cat) params.push('category=' + encodeURIComponent(cat));
+  if (params.length) url += '?' + params.join('&');
+  fetch(url).then(r=>r.json()).then(list=>{
+    const wrap = document.getElementById('list'); wrap.innerHTML = '';
+    list.forEach(p=>{
+      const card = document.createElement('div'); card.className='card';
+      card.innerHTML = `
+        <img src="${(p.images && p.images[0]) ? p.images[0] : 'https://via.placeholder.com/500x350?text=' + encodeURIComponent(p.name)}" />
+        <h3>${p.name}</h3>
+        <div class="muted">₹${p.price}</div>
+        <div class="muted small">${p.desc || ''}</div>
+        <div style="margin-top:8px" class="flex">
+          <button class="btn" onclick="viewProduct('${p.id}')">View</button>
+          <button class="btn" onclick="addToCart('${p.id}',1)" style="background:#333">Add to Cart</button>
+        </div>
+      `;
+      wrap.appendChild(card);
+    });
+  });
+}
+
+window.viewProduct = function(id){
+  fetch(API + '/products/' + id).then(r=>r.json()).then(p=>{
+    const root = document.getElementById('root');
+    root.innerHTML = '<div style="display:flex;gap:12px"><div style="flex:1"><img src="'+(p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/600x600')+'" style="width:100%;height:auto;border-radius:6px"/></div><div style="flex:1"><h2>'+p.name+'</h2><div class="muted">₹'+p.price+'</div><p>'+ (p.desc||'') +'</p><div class="muted">Category: '+p.category+' | Color: '+p.color+'</div><div style="margin-top:12px"><button class="btn" onclick="addToCart(\''+p.id+'\',1)">Add to Cart</button><button class="btn" onclick="buyNow(\''+p.id+'\')">Buy Now</button></div></div></div>';
+  });
+};
+
+window.addToCart = function(productId, qty){
+  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  fetch(API + '/cart', { method:'POST', headers: { 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty }) })
+    .then(r=>r.json()).then(res=>{ alert(res.message || 'Added'); fetchCartCount(); }).catch(()=>alert('Error'));
+};
+
+window.buyNow = function(productId){
+  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  fetch(API + '/cart', { method:'POST', headers:{ 'Content-Type':'application/json','Authorization':'Bearer ' + window.appState.token }, body: JSON.stringify({ productId, qty:1 }) })
+    .then(()=> renderCart());
+};
+
+function renderCart(){
+  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  fetch(API + '/cart', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
+    .then(r=>r.json()).then(data=>{
+      const root = document.getElementById('root');
+      let html = '<h2>Your Cart</h2>';
+      if (!data.items || data.items.length===0) { root.innerHTML = html + '<div class="panel">Cart empty</div>'; return; }
+      html += '<div class="panel">';
+      let total = 0;
+      data.items.forEach(it => {
+        const p = it.product || {};
+        const sub = (p.price||0) * it.qty; total += sub;
+        html += '<div style="display:flex;gap:12px;align-items:center;margin-bottom:8px"><div style="flex:1"><b>'+ (p.name||'') +'</b><div class="muted">₹'+(p.price||0)+'</div></div><div>Qty: '+it.qty+'</div><div><button class="btn" onclick="removeCart(\''+(p.id||'')+'\')">Remove</button></div></div>';
+      });
+      html += '<hr><div><b>Total: ₹'+total+'</b></div><div style="margin-top:8px"><button class="btn" onclick="renderCheckout()">Checkout (Cash on Delivery)</button></div></div>';
+      root.innerHTML = html;
+    });
+}
+
+window.removeCart = function(productId){
+  fetch(API + '/cart/' + productId, { method:'DELETE', headers: { 'Authorization': 'Bearer ' + window.appState.token } })
+    .then(r=>r.json()).then(res=>{ alert(res.message); renderCart(); fetchCartCount(); });
+};
+
+window.renderCheckout = function(){
+  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  const root = document.getElementById('root');
+  root.innerHTML = '<h2>Checkout (Cash on Delivery)</h2><div class="panel"><input id="ship-name" placeholder="Name" value="'+(window.appState.user?window.appState.user.name:'')+'"/><input id="ship-mobile" placeholder="Mobile" value="'+(window.appState.user?window.appState.user.mobile:'')+'"/><input id="ship-address" placeholder="Address"/><input id="ship-city" placeholder="City"/><input id="ship-pincode" placeholder="Pincode"/><button class="btn" id="btn-place">Place Order</button></div>';
+  document.getElementById('btn-place').addEventListener('click', ()=>{
+    const shipping = {
+      name: document.getElementById('ship-name').value.trim(),
+      mobile: document.getElementById('ship-mobile').value.trim(),
+      address: document.getElementById('ship-address').value.trim(),
+      city: document.getElementById('ship-city').value.trim(),
+      pincode: document.getElementById('ship-pincode').value.trim()
+    };
+    if (!shipping.name||!shipping.mobile||!shipping.address||!shipping.city||!shipping.pincode) return alert('Please fill all fields');
+    fetch(API + '/order', { method:'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.appState.token }, body: JSON.stringify({ shipping }) })
+      .then(r=>r.json()).then(res=>{ if (res.order) { alert('Order placed: ' + res.order.id); renderOrders(); fetchCartCount(); } else alert(res.message || 'Error'); });
+  });
+};
+
+function renderOrders(){
+  if (!window.appState.token){ alert('Please login/register'); renderAuth(); return; }
+  fetch(API + '/orders', { headers: { 'Authorization': 'Bearer ' + window.appState.token } })
+    .then(r=>r.json()).then(list=>{
+      const root = document.getElementById('root');
+      let html = '<h2>Your Orders</h2><div class="panel">';
+      if (!list || list.length===0) html += 'No orders yet';
+      else {
+        list.forEach(o=>{
+          html += '<div style="border-bottom:1px dashed #ddd;padding:8px 0"><b>Order: '+o.id+'</b><div class="muted">Placed: '+ new Date(o.createdAt).toLocaleString() +'</div><div>Total: ₹'+o.totalAmount+'</div><div>Payment: '+o.paymentMode+' | Status: '+o.orderStatus+'</div><div class="muted">Ship to: '+o.shipping.name+', '+o.shipping.address+', '+o.shipping.city+' - '+o.shipping.pincode+'</div></div>';
+        });
+      }
+      html += '</div>';
+      root.innerHTML = html;
+    });
+}
+
+function renderAuth(){
+  const root = document.getElementById('root');
+  root.innerHTML = '<h2>Login / Register</h2><div class="panel"><h3>Register</h3><input id="reg-name" placeholder="Name"/><input id="reg-mobile" placeholder="Mobile"/><button class="btn" id="btn-reg">Register</button><hr/><h3>Login</h3><input id="login-mobile" placeholder="Mobile"/><button class="btn" id="btn-login">Login</button></div>';
+  document.getElementById('btn-reg').addEventListener('click', ()=>{
+    const name = document.getElementById('reg-name').value.trim();
+    const mobile = document.getElementById('reg-mobile').value.trim();
+    if (!name || !mobile) return alert('name & mobile required');
+    fetch(API + '/auth/register', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name, mobile }) })
+      .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Registered'); renderApp(); } else alert(res.message || 'Error'); });
+  });
+  document.getElementById('btn-login').addEventListener('click', ()=>{
+    const mobile = document.getElementById('login-mobile').value.trim();
+    if (!mobile) return alert('mobile required');
+    fetch(API + '/auth/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ mobile }) })
+      .then(r=>r.json()).then(res=>{ if (res.token) { setAuth(res.token, res.user); alert('Logged in'); renderApp(); } else alert(res.message || 'Error'); });
+  });
+}
+
+// Init
+updateHeader();
+renderApp();
 </script>
+
 </body>
 </html>
