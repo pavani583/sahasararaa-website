@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Login / Register — SAHASARARAA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;margin:0}
+  .wrap{max-width:420px;margin:48px auto;padding:20px;border-radius:8px;border:1px solid #eee;background:#fafafa}
+  h2{color:#8b0000;margin:0 0 10px}
+  input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ddd}
+  .btn{background:#8b0000;color:#fff;border:none;padding:10px 12px;border-radius:6px;width:100%;cursor:pointer}
+  .small{font-size:13px;color:#666;margin-top:8px}
+  .link{color:#8b0000;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h2>Login / Register</h2>
+
+  <div id="reg-box">
+    <h3 style="margin-bottom:6px">Register</h3>
+    <input id="reg-name" placeholder="Full name" />
+    <input id="reg-mobile" placeholder="Mobile number" />
+    <button class="btn" id="btn-reg">Register & Get Token</button>
+  </div>
+
+  <hr style="margin:14px 0">
+
+  <div id="login-box">
+    <h3 style="margin-bottom:6px">Login</h3>
+    <input id="login-mobile" placeholder="Mobile number" />
+    <button class="btn" id="btn-login">Login</button>
+  </div>
+
+  <p class="small">After login you'll be redirected to the shop. For admin, use the admin panel with your secret key.</p>
+  <p style="margin-top:12px"><a href="/" class="link">Back to Home</a></p>
+</div>
+
+<script>
+const API = '/api';
+function setAuth(token,user){
+  if(token) localStorage.setItem('token', token); else localStorage.removeItem('token');
+  if(user) localStorage.setItem('user', JSON.stringify(user)); else localStorage.removeItem('user');
+}
+
+/* Register */
+document.getElementById('btn-reg').addEventListener('click', ()=>{
+  const name = document.getElementById('reg-name').value.trim();
+  const mobile = document.getElementById('reg-mobile').value.trim();
+  if(!name || !mobile) return alert('Name and mobile required');
+  fetch(API + '/auth/register', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name, mobile }) })
+    .then(r=>r.json()).then(res=>{
+      if(res.token){ setAuth(res.token, res.user); alert('Registered'); window.location = '/'; }
+      else alert(res.message || 'Error');
+    }).catch(()=>alert('Network error'));
+});
+
+/* Login */
+document.getElementById('btn-login').addEventListener('click', ()=>{
+  const mobile = document.getElementById('login-mobile').value.trim();
+  if(!mobile) return alert('Mobile required');
+  fetch(API + '/auth/login', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ mobile }) })
+    .then(r=>r.json()).then(res=>{
+      if(res.token){ setAuth(res.token, res.user); alert('Logged in'); window.location = '/'; }
+      else alert(res.message || 'Error');
+    }).catch(()=>alert('Network error'));
+});
+</script>
+
+</body>
+</html>
