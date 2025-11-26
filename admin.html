@@ -1,188 +1,209 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sahasrara Admin Panel</title>
-
+  <meta charset="utf-8" />
+  <title>SAHASR ARA — Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      margin: 0;
-      background: #f9f9f9;
-      font-family: Arial, sans-serif;
+    :root{
+      --primary: #6a2ecc;
+      --accent:  #ff7aa2;
+      --bg: #f6f5fb;
+      --card: #fff;
+      --muted: #6b6b6b;
+      --radius: 12px;
     }
-
-    .navbar {
-      background: #222;
-      color: white;
-      padding: 15px 20px;
-      font-size: 22px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .container {
-      width: 90%;
-      max-width: 900px;
-      margin: 30px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      margin-top: 0;
-      color: #b30059;
-      border-left: 5px solid #b30059;
-      padding-left: 10px;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 6px;
-      border: 1px solid #bbb;
-      font-size: 15px;
-    }
-
-    button {
-      background: #b30059;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    button:hover {
-      background: #800040;
-    }
-
-    .product-card {
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-      margin: 12px 0;
-      background: #fafafa;
-    }
-
-    .product-card img {
-      width: 120px;
-      height: 140px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .delete-btn {
-      background: #d11a2a !important;
-    }
-
-    .delete-btn:hover {
-      background: #a30018 !important;
+    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#111;padding:12px}
+    header{background:linear-gradient(90deg,var(--primary),#5633b1);color:#fff;padding:12px;border-radius:10px}
+    header h1{margin:0;font-size:18px}
+    .wrap{max-width:980px;margin:18px auto}
+    .panel{background:var(--card);padding:14px;border-radius:12px;border:1px solid #eee;margin-bottom:12px}
+    input,textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid #eae7f5;margin-top:8px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .card{background:#faf9ff;padding:10px;border-radius:10px;border:1px solid #f0eefb;display:flex;gap:10px;align-items:flex-start}
+    .card img{width:90px;height:100px;object-fit:cover;border-radius:8px}
+    .btn{padding:10px;border-radius:10px;border:none;cursor:pointer}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.warn{background:#d11a2a;color:#fff}
+    .muted{color:var(--muted)}
+    @media (max-width:720px){
+      .card{flex-direction:row;align-items:center}
+      .card img{width:80px;height:80px}
     }
   </style>
-
 </head>
 <body>
+  <header>
+    <h1>SAHASR ARA — Admin Panel</h1>
+  </header>
 
-  <div class="navbar">SAHASRARA — Admin Panel</div>
+  <main class="wrap">
+    <div id="admin-gate" class="panel">
+      <div style="font-weight:700">Admin Access</div>
+      <div class="muted" style="margin-top:6px">Enter admin secret to manage products (local testing).</div>
+      <input id="admin-secret" placeholder="Enter admin secret" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="btnUnlock" class="btn primary">Unlock</button>
+        <button id="btnSeed" class="btn" title="Restore sample seed">Seed Sample Products</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Admin secret for testing: <b>sahasrara_admin_2025</b></div>
+    </div>
 
-  <div class="container">
-    <h2>Add New Product</h2>
+    <div id="admin-area" style="display:none">
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Add New Product</h3>
+        <input id="title" placeholder="Product title (e.g. Elegant Silk Saree)" />
+        <input id="price" placeholder="Price (number)" />
+        <input id="image" placeholder="Image URL (first image shown)" />
+        <input id="category" placeholder="Category (Silk, Cotton...)" />
+        <input id="color" placeholder="Color (e.g. Maroon)" />
+        <textarea id="description" placeholder="Description" rows="3"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn primary" id="btnAdd">Add Product</button>
+          <button class="btn" id="btnExport">Export JSON</button>
+        </div>
+      </div>
 
-    <input type="text" id="title" placeholder="Product Title" />
-    <input type="text" id="price" placeholder="Price" />
-    <input type="text" id="image" placeholder="Image URL" />
-    <textarea id="description" placeholder="Description"></textarea>
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Existing Products</h3>
+        <div id="productList" class="grid"></div>
+      </div>
+    </div>
 
-    <button onclick="addProduct()">Add Product</button>
-  </div>
-
-  <div class="container">
-    <h2>Existing Products</h2>
-    <div id="productList">Loading...</div>
-  </div>
+    <div id="message" style="display:none" class="panel"></div>
+  </main>
 
   <script>
-    const API = "/api/products";
-    const adminSecret = "ramanayya2602"; // Hardcoded admin secret
+    /* Admin uses same storage keys as index.html */
+    const KEY_PRODUCTS = 'sahasrara_products_v1';
 
-    async function loadProducts() {
-      let res = await fetch(API);
-      let data = await res.json();
+    // admin secret (for testing)
+    const ADMIN_SECRET = 'sahasrara_admin_2025';
 
-      const container = document.getElementById("productList");
-      container.innerHTML = "";
+    // get / set helpers
+    function getProducts(){ try{ return JSON.parse(localStorage.getItem(KEY_PRODUCTS) || '[]') } catch(e){ return [] } }
+    function setProducts(list){ localStorage.setItem(KEY_PRODUCTS, JSON.stringify(list)); }
 
-    data.forEach(p => {
-        container.innerHTML += `
-          <div class="product-card">
-            <img src="${p.image}" alt="Product Image" />
-            <div style="flex:1;">
-              <h3>${p.title}</h3>
-              <p>${p.description || ''}</p>
-              <p><b>₹${p.price}</b></p>
+    // seed (same sample as index for parity)
+    function seed(){
+      const sample = [
+        { id: 'p1', name: 'Elegant Kanchipuram Silk Saree', price: 3999, images: ['https://images.unsplash.com/photo-1600180758895-1b66b8b3b6e6?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=7b674b2b5206f7b14ebf1a8a2d6bfe3c'], desc: 'Traditional Kanchipuram silk with rich border', category: 'Silk', color: 'Maroon' },
+        { id: 'p2', name: 'Banarasi Heritage Saree', price: 4599, images: ['https://images.unsplash.com/photo-1562158070-1f6a9b1f3bfc?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=b6be4d6f2b0f1b9f168a4d9fd2ec8b6e'], desc: 'Banarasi weaving with gold thread', category: 'Banarasi', color: 'Gold' },
+        { id: 'p3', name: 'Soft Cotton Everyday Saree', price: 1299, images: ['https://images.unsplash.com/photo-1543168256-78c1a440f6ce?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=5d7b6f8c0a9f4db4c2f6d1c8e0a219a0'], desc: 'Comfortable cotton for daily wear', category: 'Cotton', color: 'Blue' },
+        { id: 'p4', name: 'Pattu Festive Saree', price: 2999, images: ['https://images.unsplash.com/photo-1520975916374-0f5d1a2b6f8a?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=0d3bf2e7a6e1f3d5c9b7f4a2d1a6d7c8'], desc: 'Pattu saree with bright hues', category: 'Pattu', color: 'Pink' }
+      ];
+      setProducts(sample);
+      showMessage('Seeded sample products (4 items)', 2500);
+      renderList();
+    }
+
+    // UI helpers
+    function showMessage(txt= '', ms=2000){
+      const el = document.getElementById('message');
+      el.style.display='block'; el.innerHTML = txt;
+      setTimeout(()=>{ el.style.display='none'; }, ms);
+    }
+
+    // admin unlock
+    document.getElementById('btnUnlock').addEventListener('click', ()=>{
+      const val = document.getElementById('admin-secret').value.trim();
+      if (val === ADMIN_SECRET){
+        document.getElementById('admin-gate').style.display='none';
+        document.getElementById('admin-area').style.display='block';
+        renderList();
+        showMessage('Admin unlocked');
+      } else {
+        alert('Invalid secret');
+      }
+    });
+
+    // seed button
+    document.getElementById('btnSeed').addEventListener('click', ()=>{ if(confirm('Replace products with sample seed?')) seed(); });
+
+    // add product
+    document.getElementById('btnAdd').addEventListener('click', ()=>{
+      const title = document.getElementById('title').value.trim();
+      const price = Number(document.getElementById('price').value.trim());
+      const image = document.getElementById('image').value.trim();
+      const category = document.getElementById('category').value.trim();
+      const color = document.getElementById('color').value.trim();
+      const desc = document.getElementById('description').value.trim();
+      if (!title || !price) return alert('Title and price required');
+      const products = getProducts();
+      const id = 'p' + Date.now();
+      products.unshift({ id, name: title, price, images: image ? [image] : [], desc, category, color });
+      setProducts(products);
+      showMessage('Product added');
+      // clear inputs
+      document.getElementById('title').value='';document.getElementById('price').value='';document.getElementById('image').value='';document.getElementById('description').value='';
+      renderList();
+    });
+
+    // render product list
+    function renderList(){
+      const wrap = document.getElementById('productList');
+      const products = getProducts();
+      wrap.innerHTML = '';
+      if (!products.length) { wrap.innerHTML = '<div class="muted">No products</div>'; return; }
+      products.forEach(p=>{
+        const div = document.createElement('div'); div.className='card';
+        div.innerHTML = `<img src="${p.images && p.images[0] ? p.images[0] : 'https://via.placeholder.com/300x300?text=Image'}" alt="${p.name}">
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:700">${p.name}</div>
+              <div style="font-weight:700;color:var(--primary)">₹${p.price}</div>
             </div>
-            <button class="delete-btn" onclick="deleteProduct('${p._id}')">Delete</button>
-          </div>
-        `;
+            <div class="muted">${p.category || ''} • ${p.color || ''}</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button class="btn" onclick='editProduct("${p.id}")'>Edit</button>
+              <button class="btn warn" onclick='deleteProduct("${p.id}")'>Delete</button>
+            </div>
+          </div>`;
+        wrap.appendChild(div);
       });
     }
 
-    async function addProduct() {
-      const product = {
-        title: document.getElementById("title").value,
-        price: document.getElementById("price").value,
-        image: document.getElementById("image").value,
-        description: document.getElementById("description").value
-      };
+    // delete
+    function deleteProduct(id){
+      if (!confirm('Delete this product?')) return;
+      let list = getProducts(); list = list.filter(p=>p.id !== id); setProducts(list); renderList(); showMessage('Deleted');
+    }
 
-      let res = await fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-secret": adminSecret
-        },
-        body: JSON.stringify(product)
-      });
+    // edit (simple inline prompt)
+    function editProduct(id){
+      const products = getProducts();
+      const p = products.find(x=>x.id===id);
+      if (!p) return;
+      const newTitle = prompt('Product title', p.name);
+      if (newTitle === null) return;
+      const newPrice = prompt('Price', p.price);
+      if (newPrice === null) return;
+      p.name = newTitle.trim() || p.name;
+      p.price = Number(newPrice) || p.price;
+      setProducts(products);
+      showMessage('Updated');
+      renderList();
+    }
 
-      if (res.ok) {
-        alert("Product added successfully!");
-        loadProducts();
+    // export json
+    document.getElementById('btnExport').addEventListener('click', ()=>{
+      const data = JSON.stringify(getProducts(), null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'products.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // initialize: if no products seed with sample
+    (function init(){
+      if (!localStorage.getItem(KEY_PRODUCTS)) {
+        // keep seed but not overwrite if user already had products
+        seed();
       } else {
-        alert("Failed to add product");
+        renderList();
       }
-    }
-
-    async function deleteProduct(id) {
-      if (!confirm("Delete this product?")) return;
-
-      let res = await fetch(⁠ ${API}/${id} ⁠, {
-        method: "DELETE",
-        headers: {
-          "x-admin-secret": adminSecret
-        }
-      });
-
-      if (res.ok) {
-        alert("Product deleted");
-        loadProducts();
-      } else {
-        alert("Failed to delete");
-      }
-    }
-
-    loadProducts();
+    })();
   </script>
-
 </body>
 </html>
